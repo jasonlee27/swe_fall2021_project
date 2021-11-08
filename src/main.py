@@ -41,7 +41,7 @@ def login():
             session['id'] = account['id']
             session['username'] = account['username']
             # Redirect to home page
-            return 'Logged in successfully!'
+            return redirect(url_for('home'))
         else:
             # Account doesnt exist or username/password incorrect
             msg = 'Incorrect username/password!'
@@ -78,10 +78,61 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email,))
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
+        # end if
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
     # Show registration form with message (if any)
     return render_template(str(register_html), msg=msg)
+
+
+# http://localhost:5000/egrocerycart/home
+# This will be the home page, only accessible for loggedin users
+@app.route('/egrocerycart/home')
+def home():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        home_html = Macros.FRONTEND_DIR / 'home.html'
+        # User is loggedin show them the home page
+        return render_template(str(home_html), username=session['username'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+
+# http://localhost:5000/egrocerycart/profile
+# This will be the profile page, only accessible for loggedin users
+@app.route('/egrocerycart/profile')
+def profile():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        profile_html = Macros.FRONTEND_DIR / 'profile.html'
+        # We need all the account info for the user so we can display it on the profile page
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
+        account = cursor.fetchone()
+        # Show the profile page with account info
+        return render_template(str(profile_html), account=account)
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
 
 
