@@ -7,7 +7,8 @@ import os
 
 class Database:
 
-    def create_account_table(cursor):
+    @classmethod
+    def create_account_table(cls, cursor, mysql):
         query = "CREATE DATABASE IF NOT EXISTS `grocerycart_db` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;"
         cursor.execute(query)
         query = "USE `grocerycart_db`;"
@@ -20,13 +21,17 @@ class Database:
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;"
         cursor.execute(query)
+        query = "INSERT INTO `accounts` (`id`, `username`, `password`, `email`) VALUES (1, 'test_username', 'test_pw', 'test@test.com');"
+        cursor.execute(query)
+        mysql.connection.commit()
         return
 
-    def insert_account_record(cursor, mysql, data):
+    @classmethod
+    def insert_account_record(cls, cursor, mysql, data):
         # query = "INSERT INTO `accounts` (`id`, `username`, `password`, `email`) VALUES (1, 'test_username', 'test_pw', 'test@test.com');"
         # data: [hash_username, hash_password, email]
         if not os.path.exists(Macros.DB_FILE):
-            cls.create_account_table(cursor)
+            cls.create_account_table(cursor, mysql)
         # end if
         query = cursor.execute(
             'INSERT INTO accounts VALUES (NULL, %s, %s, %s)',
@@ -35,10 +40,12 @@ class Database:
         mysql.connection.commit()
         return cursor, mysql
 
-    def delete_account_record(cursor, mysql, data):
+    @classmethod
+    def delete_account_record(cls, cursor, mysql, data):
         pass
-
-    def update_account_record(cursor, mysql, data):
+    
+    @classmethod
+    def update_account_record(cls, cursor, mysql, data):
         pass
 
     

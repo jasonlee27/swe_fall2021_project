@@ -1,6 +1,8 @@
 import hashlib
 import re, os
 
+from macros import Macros
+
 
 class Utils:
 
