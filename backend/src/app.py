@@ -2,27 +2,22 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 from flask_mysqldb import MySQL
 
 from macros import Macros
+from utils import Utils
+from database import Database
 
 import MySQLdb.cursors
-import hashlib
-import re
-
 
 app = Flask(__name__)
 app.secret_key = Macros.SECRETE_KEY
 
 # DB connection details
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'grocerycart_db'
+app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
+app.config['MYSQL_USER'] = Macros.MYSQL_USER
+app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = Macros.MYSQL_DB
 
 mysql = MySQL(app)
 
-def hashing(user_password, salt="5gz"):
-    db_password = user_password+salt
-    h = hashlib.md5(db_password.encode())
-    return h.hexdigest()
 
 @app.route('/egrocerycart/login', methods=['GET', 'POST'])
 def login():
@@ -30,8 +25,8 @@ def login():
     if request.method =='POST' and \
        'username' in request.form and \
        'password' in request.form:
-        username = hashing(request.form['username'])
-        password = hashing(request.form['password'])
+        username = Utils.hashing(request.form['username'])
+        password = Utils.hashing(request.form['password'])
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -47,7 +42,7 @@ def login():
             session['username'] = account['username']
 
             return jsonify(
-                data=hashing(username, password)
+                data=Utils.hashing(username, password)
             )
         # end if
     # end if
@@ -89,8 +84,8 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        hash_username = hashing(username)
-        hash_password = hashing(password)
+        hash_username = Utils.hashing(username)
+        hash_password = Utils.hashing(password)
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -100,21 +95,25 @@ def register():
         # If account exists show error and validation checks
         if account:
             msg = 'Account already exists!'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        elif not Utils.isvalid_email(email):
             msg = 'Invalid email address!'
-        elif not re.match(r'[A-Za-z0-9]+', username):
+        elif not Utils.isvalid_username(username):
             msg = 'Username must contain only characters and numbers!'
+        elif not Utils.isvalid_password(password):
+            msg = 'Invalid password format!'
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (hash_username, hash_password, email,))
-            mysql.connection.commit()
+            # cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (hash_username, hash_password, email,))
+            # mysql.connection.commit()
+            Database.insert_account_record(cursor, mysql, [hash_username, hash_password, email])
             msg = 'You have successfully registered!'
         # end if
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
+    # end if
     return jsonify(
         msg=msg
     )

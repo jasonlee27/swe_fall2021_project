@@ -15,7 +15,7 @@ class Macros:
     ROOT_DIR: Path = SRC_DIR.parent.parent
     BACKEND_DIR: Path = SRC_DIR.parent
     DB_DIR: Path = BACKEND_DIR / "_database"
-    DB_FILR: Path = DB_DIR / "grocerycart_db"
+    DB_FILE: Path = DB_DIR / "grocerycart_db"
     FRONTEND_DIR: Path = ROOT_DIR / "frontend"
 
     MYSQL_HOST = 'localhost'
