@@ -14,17 +14,20 @@ class Utils:
 
     @classmethod
     def isvalid_email(cls, email):
-        return re.match(r'[^@]+@[^@]+\.[^@]+', email)
+        m = re.match(r'[^@]+@[^@]+\.[^@]+', email)
+        return True if m else False
 
     @classmethod
     def isvalid_username(cls, username):
-        return re.match("^[a-zA-Z0-9_.-]+$", username)
+        m = re.match("^[a-zA-Z0-9_.-]+$", username)
+        return True if m else False
 
     @classmethod
     def isvalid_password(cls, password):
         if len(password)<10:
             return False
         # end if
-        return re.match(r"^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$])[\w\d@#$]{6,12}$", password)
+        m = re.match(r"^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{10,100}$", password)
+        return True if m else False
 
     
