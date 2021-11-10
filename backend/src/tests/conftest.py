@@ -1,4 +1,6 @@
-
+# This script is to generate test cases using pytest
+# the test is run by "python -m pytest"
+# at the backend/src
 
 import pytest
 
