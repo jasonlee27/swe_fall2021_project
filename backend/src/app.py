@@ -42,7 +42,7 @@ def login():
             session['username'] = account['username']
 
             return jsonify(
-                msg="Sucessfully loged in"
+                msg="Successfully logged in"
             )
         # end if
     # end if
@@ -108,7 +108,7 @@ def register():
             # cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (hash_username, hash_password, email,))
             # mysql.connection.commit()
             Database.insert_account_record(cursor, mysql, [hash_username, hash_password, email])
-            msg = 'Successfully registered!'
+            msg = 'Successfully registered'
         # end if
     elif request.method == 'POST':
         # Form is empty... (no POST data)
