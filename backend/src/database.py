@@ -19,23 +19,23 @@ class Database:
   	`password` varchar(255) NOT NULL,
   	`email` varchar(100) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;"
+) CHARSET=utf8;"
         cursor.execute(query)
-        query = "INSERT INTO `accounts` (`id`, `username`, `password`, `email`) VALUES (1, 'test_username', 'test_pw', 'test@test.com');"
+        query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         cursor.execute(query)
         mysql.connection.commit()
         return
 
     @classmethod
     def insert_account_record(cls, cursor, mysql, data):
-        # query = "INSERT INTO `accounts` (`id`, `username`, `password`, `email`) VALUES (1, 'test_username', 'test_pw', 'test@test.com');"
+        # query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         # data: [hash_username, hash_password, email]
         if not os.path.exists(Macros.DB_FILE):
             cls.create_account_table(cursor, mysql)
         # end if
-        query = cursor.execute(
-            'INSERT INTO accounts VALUES (NULL, %s, %s, %s)',
-            (data[0], data[1], data[2],)
+        cursor.execute(
+            'INSERT INTO accounts (username, password, email) VALUES (%s, %s, %s)',
+            (data[0], data[1], data[2])
         )
         mysql.connection.commit()
         return cursor, mysql

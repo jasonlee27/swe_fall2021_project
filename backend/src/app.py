@@ -51,9 +51,7 @@ def login():
         msg=msg
     )
 
-
 # http://localhost:5000/egrocerycart/logout
-# This will be the logout page
 @app.route('/egrocerycart/logout')
 def logout():
     # Remove session data, this will log the user out
@@ -66,14 +64,10 @@ def logout():
         msg=msg
     )
 
-
 # http://localhost:5000/egrocerycart/register
-# this will be the registration page, we need to use both GET and POST requests
 @app.route('/egrocerycart/register', methods=['GET', 'POST'])
 def register():
-    # Output message if something goes wrong...
     msg = ''
-    register_html = Macros.FRONTEND_DIR / 'register.html'
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
        'username' in request.form and\
@@ -89,7 +83,7 @@ def register():
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (hash_username,))
+        cursor.execute('SELECT * FROM accounts WHERE username = %s', (hash_username,))        
         account = cursor.fetchone()
         
         # If account exists show error and validation checks
@@ -118,34 +112,88 @@ def register():
         msg=msg
     )
 
+# http://localhost:5000/egrocerycart/register
+@app.route('/egrocerycart/shopping', methods=['GET', 'POST'])
+def add_item():
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'item' in request.form and \
+       'add' in request.form:
+        
+        # Create variables for easy access
+        isadd = request.form['add']
+        store_loc = request.form['location']
+        itemname = request.form['item']
+        quantity = request.form['quantity']
 
-# # http://localhost:5000/egrocerycart/home
-# # This will be the home page, only accessible for loggedin users
-# @app.route('/egrocerycart/home')
-# def home():
-#     # Check if user is loggedin
-#     if 'loggedin' in session:
-#         home_html = Macros.FRONTEND_DIR / 'home.html'
-#         # User is loggedin show them the home page
-#         return render_template(str(home_html), username=session['username'])
-#     # User is not loggedin redirect to login page
-#     return redirect(url_for('login'))
+        if isadd:
+            # Check if item exists using MySQL
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+                'SELECT * FROM items WHERE location = %s AND itemname = %s AND quantity >= %s',
+                (store_loc, itemname, quantity)
+            )
+            isavail = cursor.fetchone()
+            if isavail:
+                cursor.execute(
+                    'UPDATE items SET quantity = quantity - %s WHERE location = %s AND itemname = %s',
+                    (quantity, store_loc, itemname)
+                )
+                mysql.connection.commit()
+                msg = 'Successfully added'
+            else:
+                msg = 'Item is not available'
+            # end if
+        else:
+            msg = 'Addition failed'
+        # end if
+    # end if    
+    return jsonify(
+        msg=msg
+    )
 
+# http://localhost:5000/egrocerycart/register
+@app.route('/egrocerycart/shopping', methods=['GET', 'POST'])
+def delete_item():
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'item' in request.form and \
+       'delete' in request.form:
+        
+        # Create variables for easy access
+        isdelete = request.form['delete']
+        store_loc = request.form['location']
+        itemname = request.form['item']
+        quantity = request.form['quantity']
 
-# # http://localhost:5000/egrocerycart/profile
-# # This will be the profile page, only accessible for loggedin users
-# @app.route('/egrocerycart/profile')
-# def profile():
-#     # Check if user is loggedin
-#     if 'loggedin' in session:
-#         profile_html = Macros.FRONTEND_DIR / 'profile.html'
-#         # We need all the account info for the user so we can display it on the profile page
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
-#         account = cursor.fetchone()
-#         # Show the profile page with account info
-#         return render_template(str(profile_html), account=account)
-#     # User is not loggedin redirect to login page
-#     return redirect(url_for('login'))
-
-
+        if isdelete:
+            # Check if item exists using MySQL
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(
+                'SELECT * FROM items WHERE location = %s AND itemname = %s',
+                (store_loc, itemname)
+            )
+            isavail = cursor.fetchone()
+            if isavail:
+                # Check if item exists using MySQL
+                cursor.execute(
+                    'UPDATE items SET quantity = quantity + %s WHERE location = %s AND itemname = %s',
+                    (quantity, store_loc, itemname)
+                )
+                mysql.connection.commit()
+            else:
+                cursor.execute(
+                    'INSERT INTO items (location, itemname, quantity) VALUES (%s, %s, %s)',
+                    (store_loc, itemname, quantity)
+                )
+            # end if
+            msg = 'Successfully deleted'
+        else:
+            msg = 'Deletion failed'
+        # end if
+    # end if
+    return jsonify(
+        msg=msg
+    )
