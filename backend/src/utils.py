@@ -27,6 +27,7 @@ class Utils:
         if len(password)<10:
             return False
         # end if
+        # m = True
         m = re.match(r"^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{10,100}$", password)
         return True if m else False
     

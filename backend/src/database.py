@@ -8,25 +8,23 @@ import os
 class Database:
 
     @classmethod
-    def create_account_table(cls, cursor, mysql):
-        query = "CREATE DATABASE IF NOT EXISTS `grocerycart_db` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;"
-        cursor.execute(query)
-        query = "USE `grocerycart_db`;"
-        cursor.execute(query)
-        query = "CREATE TABLE IF NOT EXISTS `accounts` ( `id` int(11) NOT NULL AUTO_INCREMENT, `username` varchar(50) NOT NULL, `password` varchar(255) NOT NULL, `email` varchar(100) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;"
-        cursor.execute(query)
-        query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
-        cursor.execute(query)
-        mysql.connection.commit()
+    def user_exists_in_db(cls, cursor, mysql, hash_username, hash_password=None):
+        
+        if not hash_password:
+            cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (hash_username, hash_password))
+        else:
+            cursor.execute('SELECT * FROM accounts WHERE username = %s', (hash_username,))
+        # end if
+        account = cursor.fetchone()
+        if account:
+            return account
+        # end if
         return
 
     @classmethod
     def insert_account_record(cls, cursor, mysql, data):
         # query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         # data: [hash_username, hash_password, email]
-        if not os.path.exists(Macros.DB_FILE):
-            cls.create_account_table(cursor, mysql)
-        # end if
         cursor.execute(
             'INSERT INTO accounts (username, password, email) VALUES (%s, %s, %s)',
             (data[0], data[1], data[2])

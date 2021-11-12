@@ -11,12 +11,13 @@ app = Flask(__name__)
 app.secret_key = Macros.SECRETE_KEY
 
 # DB connection details
-app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
+# app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
-app.config['MYSQL_DB'] = Macros.MYSQL_DB
+# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
+Macros.DB_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.route("/api/status", methods=['GET'])
 def status():
@@ -28,28 +29,27 @@ def login():
     if request.method =='POST' and \
        'username' in request.form and \
        'password' in request.form:
-        username = Utils.hashing(request.form['username'])
-        password = Utils.hashing(request.form['password'])
+        username = request.form['username']
+        password = request.form['password']
+        username = Utils.hashing(username)
+        password = Utils.hashing(password)
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
-
-        # Fetch one record and return result
-        account = cursor.fetchone()
-
+        account = Database.user_exists_in_db(cursor, mysql, username, hash_password=password)
         if account:
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
-
-            return jsonify(
-                msg="Successfully logged in"
-            )
+            msg = "Successfully logged in!"
+        else:
+            msg = 'Incorrect username/password!'
         # end if
     # end if
-    msg = 'Incorrect username/password!'
+    
+    cursor.close()
+    print(msg)
     return jsonify(
         msg=msg
     )
@@ -88,16 +88,11 @@ def register():
         hash_username = Utils.hashing(username)
         hash_password = Utils.hashing(password)
 
-        print('username:'+username)    
-        print('password:'+password)    
-        print('email:'+email)    
-        
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (hash_username,))        
-        account = cursor.fetchone()
         
         # If account exists show error and validation checks
+        account = Database.user_exists_in_db(cursor, mysql, hash_username)
         if account:
             msg = 'Account already exists!'
         elif not Utils.isvalid_email(email):
@@ -119,6 +114,8 @@ def register():
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
     # end if
+    cursor.close()
+    print(msg)
     return jsonify(
         msg=msg
     )

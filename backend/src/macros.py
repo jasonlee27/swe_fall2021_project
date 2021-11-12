@@ -15,10 +15,13 @@ class Macros:
     ROOT_DIR: Path = SRC_DIR.parent.parent
     BACKEND_DIR: Path = SRC_DIR.parent
     DB_DIR: Path = BACKEND_DIR / "_database"
-    DB_FILE: Path = DB_DIR / "grocerycart_db"
+    DB_FILE: Path = DB_DIR / "grocerycart.db"
     FRONTEND_DIR: Path = ROOT_DIR / "frontend"
 
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = 'password'
-    MYSQL_DB = 'grocery_cart_db'
+    MYSQL_DB = 'grocerycart_db'
+
+    PORT_NUM = 3000
+    SESSION_TYPE = 'redis'
