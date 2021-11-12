@@ -20,5 +20,5 @@ class Macros:
 
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
-    MYSQL_PASSWORD = 'root_password'
+    MYSQL_PASSWORD = 'password'
     MYSQL_DB = 'grocery_cart_db'

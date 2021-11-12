@@ -18,8 +18,11 @@ app.config['MYSQL_DB'] = Macros.MYSQL_DB
 
 mysql = MySQL(app)
 
+@app.route("/api/status", methods=['GET'])
+def status():
+  return "running"
 
-@app.route('/egrocerycart/login', methods=['GET', 'POST'])
+@app.route('/api/login', methods=['GET', 'POST'])
 def login():
     msg = ''
     if request.method =='POST' and \
@@ -51,8 +54,9 @@ def login():
         msg=msg
     )
 
-# http://localhost:5000/egrocerycart/logout
-@app.route('/egrocerycart/logout')
+# http://localhost:5000/api/logout
+# This will be the logout page
+@app.route('/api/logout')
 def logout():
     # Remove session data, this will log the user out
     session.pop('loggedin', None)
@@ -64,10 +68,13 @@ def logout():
         msg=msg
     )
 
-# http://localhost:5000/egrocerycart/register
-@app.route('/egrocerycart/register', methods=['GET', 'POST'])
+# http://localhost:5000/api/register
+# this will be the registration page, we need to use both GET and POST requests
+@app.route('/api/register', methods=['GET', 'POST'])
 def register():
-    msg = ''
+    # Output message if something goes wrong...
+    msg = 'No input parameters'
+    #register_html = Macros.FRONTEND_DIR / 'register.html'
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
        'username' in request.form and\
@@ -80,6 +87,10 @@ def register():
         email = request.form['email']
         hash_username = Utils.hashing(username)
         hash_password = Utils.hashing(password)
+
+        print('username:'+username)    
+        print('password:'+password)    
+        print('email:'+email)    
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -154,7 +165,7 @@ def add_item():
     )
 
 # http://localhost:5000/egrocerycart/register
-@app.route('/egrocerycart/shopping', methods=['GET', 'POST'])
+@app.route('/api/shopping', methods=['GET', 'POST'])
 def delete_item():
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
@@ -197,3 +208,34 @@ def delete_item():
     return jsonify(
         msg=msg
     )
+# # http://localhost:5000/api/home
+# # This will be the home page, only accessible for loggedin users
+# @app.route('/api/home')
+# def home():
+#     # Check if user is loggedin
+#     if 'loggedin' in session:
+#         home_html = Macros.FRONTEND_DIR / 'home.html'
+#         # User is loggedin show them the home page
+#         return render_template(str(home_html), username=session['username'])
+#     # User is not loggedin redirect to login page
+#     return redirect(url_for('login'))
+
+
+# # http://localhost:5000/api/profile
+# # This will be the profile page, only accessible for loggedin users
+# @app.route('/api/profile')
+# def profile():
+#     # Check if user is loggedin
+#     if 'loggedin' in session:
+#         profile_html = Macros.FRONTEND_DIR / 'profile.html'
+#         # We need all the account info for the user so we can display it on the profile page
+#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#         cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
+#         account = cursor.fetchone()
+#         # Show the profile page with account info
+#         return render_template(str(profile_html), account=account)
+#     # User is not loggedin redirect to login page
+#     return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8080, debug=True)

@@ -13,13 +13,7 @@ class Database:
         cursor.execute(query)
         query = "USE `grocerycart_db`;"
         cursor.execute(query)
-        query = "CREATE TABLE IF NOT EXISTS `accounts` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-  	`username` varchar(50) NOT NULL,
-  	`password` varchar(255) NOT NULL,
-  	`email` varchar(100) NOT NULL,
-    PRIMARY KEY (`id`)
-) CHARSET=utf8;"
+        query = "CREATE TABLE IF NOT EXISTS `accounts` ( `id` int(11) NOT NULL AUTO_INCREMENT, `username` varchar(50) NOT NULL, `password` varchar(255) NOT NULL, `email` varchar(100) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;"
         cursor.execute(query)
         query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         cursor.execute(query)
