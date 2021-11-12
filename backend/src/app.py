@@ -208,34 +208,7 @@ def delete_item():
     return jsonify(
         msg=msg
     )
-# # http://localhost:5000/api/home
-# # This will be the home page, only accessible for loggedin users
-# @app.route('/api/home')
-# def home():
-#     # Check if user is loggedin
-#     if 'loggedin' in session:
-#         home_html = Macros.FRONTEND_DIR / 'home.html'
-#         # User is loggedin show them the home page
-#         return render_template(str(home_html), username=session['username'])
-#     # User is not loggedin redirect to login page
-#     return redirect(url_for('login'))
 
-
-# # http://localhost:5000/api/profile
-# # This will be the profile page, only accessible for loggedin users
-# @app.route('/api/profile')
-# def profile():
-#     # Check if user is loggedin
-#     if 'loggedin' in session:
-#         profile_html = Macros.FRONTEND_DIR / 'profile.html'
-#         # We need all the account info for the user so we can display it on the profile page
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
-#         account = cursor.fetchone()
-#         # Show the profile page with account info
-#         return render_template(str(profile_html), account=account)
-#     # User is not loggedin redirect to login page
-#     return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
