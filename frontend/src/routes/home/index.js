@@ -9,13 +9,13 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            story: {
+            product: {
                 id: 0,
-                title: '',
-                body: '',
-                author: '',
+                name:'',
+                code:'',
+                price:''
             },
-            stories: [],
+            products: [],
             updateDlgFlg: false,
             deleteDlgFlg: false,
             current: 0,
@@ -23,66 +23,66 @@ class Home extends Component {
             totalElements : 0,
             totalPages : 0
         };
-        this.loadStory();
+        this.loadProducts();
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.current !== this.state.current) {
-            this.loadStory();
+            this.loadProducts();
         }
     }
 
 
-    loadStory = () => {
+    loadProducts = () => {
         let self = this;
-        api.get('/api/stories', { params: {page : self.state.current, limit : self.state.limit }})
+        api.get('/api/products', { params: {page : self.state.current, limit : self.state.limit }})
             .then(function (response) {
-                console.log("stories success response :: ", response.data);
-                self.setState({stories: []});
-                self.setState({stories: self.state.stories.concat(response.data.content)});
+                console.log("products success response :: ", response.data);
+                self.setState({products: []});
+                self.setState({products: self.state.products.concat(response.data.content)});
                 self.setState({current: response.data.number});
                 self.setState({totalPages: response.data.totalPages-1});
                 self.setState({totalElements: response.data.totalElements});
             })
             .catch(function (error) {
-                console.log("stories error response :: ", error);
+                console.log("products error response :: ", error);
             });
 
 
     };
 
-    updateStory = (e) => {
+    addProduct = (e) => {
         e.preventDefault();
-        const {story} = this.state;
+        const {product} = this.state;
         let self = this;
-        api.put('/api/story/'+story.id, story)
+        api.put('/api/products/'+product.id, product)
             .then(function (response) {
-                console.log('story update success response :: ',response);
-                successMsg('Successfully Story updated.');
+                console.log('product update success response :: ',response);
+                successMsg('Successfully product updated.');
                 self.handleUpdateDlgClose();
-                self.loadStory();
+                self.loadProducts();
             })
             .catch(function (error) {
-                console.log("story update error response :: ",error);
-                errorMsg('Failed to Update Story.');
+                console.log("product update error response :: ",error);
+                errorMsg('Failed to Update product.');
             });
 
     };
 
-    deleteStory = (e) => {
+    deleteProduct = (e) => {
         e.preventDefault();
-        const {story} = this.state;
+        const {product} = this.state;
         let self = this;
-        api.delete('/api/story/'+story.id)
+        api.delete('/api/product/'+product.id)
             .then(function (response) {
-                console.log('story delete success response :: ',response);
-                successMsg('Successfully Story Deleted.');
+                console.log('product delete success response :: ',response);
+                successMsg('Successfully Product Deleted.');
                 self.handleDeleteDlgClose();
-                self.loadStory();
+                self.loadProducts();
             })
             .catch(function (error) {
-                console.log("story delete error response :: ",error);
-                errorMsg('Failed to Delete Story.');
+                console.log("product delete error response :: ",error);
+                errorMsg('Failed to Delete Product.');
             });
 
     };
@@ -93,7 +93,7 @@ class Home extends Component {
     };
 
     handleUpdateDlgShow(data) {
-        this.setStoryToState(data);
+        this.setProductToState(data);
         this.setState({updateDlgFlg: true});
     };
 
@@ -103,18 +103,18 @@ class Home extends Component {
     };
 
     handleDeleteDlgShow(data) {
-        this.setStoryToState(data);
+        this.setProductToState(data);
         this.setState({deleteDlgFlg: true});
     };
 
-    setStoryToState(data) {
-        const {story} = this.state;
+    setProductToState(data) {
+        const {product} = this.state;
         if (data !== null) {
-            story.id = data.id;
-            story.title = data.title;
-            story.body = data.body;
-            story.author = data.author;
-            this.setState({story});
+            product.id = data.id;
+            product.name = data.name;
+            product.code = data.code;
+            product.price = data.price;
+            this.setState({product});
         }
     };
 
@@ -143,23 +143,23 @@ class Home extends Component {
     }
 
     render() {
-        const {stories, story, updateDlgFlg, deleteDlgFlg, current, totalPages, totalElements} = this.state;
-        let storyItem = [];
+        const {products, product, updateDlgFlg, deleteDlgFlg, current, totalPages, totalElements} = this.state;
+        let productItem = [];
         for (let number = 0; number <= totalPages; number++) {
-            storyItem.push(
+            productItem.push(
                 <Pagination.Item active={number === current} onClick={() => this.onPaginationChange(number)}>{number+1}</Pagination.Item>
             );
         }
 
-        let storiesComponent = stories.map((story) =>
-            <div className="story">
-                <h4><strong>{story.title}</strong></h4>
-                <p>{story.body}</p>
-                By <strong>{story.author}</strong>
+        let productsComponent = products.map((product) =>
+            <div className="product">
+                <h4><strong>{product.title}</strong></h4>
+                <p>{product.body}</p>
+                By <strong>{product.author}</strong>
                 <br/> <br/>
-                <button className='btn btn-primary' onClick={() => this.handleUpdateDlgShow(story)}> Update</button>
+                <button className='btn btn-primary' onClick={() => this.handleUpdateDlgShow(product)}> Update</button>
                 &nbsp; &nbsp; &nbsp;
-                <button className='btn btn-primary' onClick={() => this.handleDeleteDlgShow(story)}> Delete</button>
+                <button className='btn btn-primary' onClick={() => this.handleDeleteDlgShow(product)}> Delete</button>
                 <hr/>
             </div>
         );
@@ -170,17 +170,17 @@ class Home extends Component {
                     <div className="starter-template">
                         <div className="row">
                             <div className="col-md-12">
-                                <div className="story-header">
-                                    <h2><strong>Stories</strong></h2>
+                                <div className="product-header">
+                                    <h2><strong>Products</strong></h2>
                                 </div>
                             </div>
                             <div className="col-md-12">
-                                {storiesComponent}
+                                {productsComponent}
                                 <div className="pagination-div">
-                                    <span>Total Stories: {totalElements}</span><br/>
+                                    <span>Total Products: {totalElements}</span><br/>
                                     <Pagination bsSize="medium">
                                         <Pagination.Prev onClick={() => this.paginationPrev()}/>
-                                        {storyItem}
+                                        {productItem}
                                         <Pagination.Next onClick={() => this.paginationNext()} />
                                     </Pagination>
                                 </div>
@@ -194,9 +194,9 @@ class Home extends Component {
                     onHide={() => this.handleUpdateDlgClose()}
                     aria-labelledby="ModalHeader"
                 >
-                    <form onSubmit={this.updateStory}>
+                    <form onSubmit={this.addProduct}>
                         <Modal.Header closeButton>
-                            <Modal.Title id='ModalHeader'>Story Update</Modal.Title>
+                            <Modal.Title id='ModalHeader'>Product Update</Modal.Title>
                         </Modal.Header>
 
                         <Modal.Body>
@@ -207,11 +207,11 @@ class Home extends Component {
                                     <div className="col-sm-10">
                                         <input type="text" className="form-control" id="title" name="title"
                                                placeholder="Title"
-                                               value={story.title}
+                                               value={product.title}
                                                maxLength="512"
                                                onChange={(e) => this.setState({
-                                                   story: {
-                                                       ...story,
+                                                   product: {
+                                                       ...product,
                                                        title: e.target.value
                                                    }
                                                })}
@@ -224,9 +224,9 @@ class Home extends Component {
                                     <div className="col-sm-10">
                                          <textarea rows="20" className="form-control" id="body" name="body"
                                                    maxLength="65535"
-                                                   value={story.body}
-                                                   onChange={(e) => this.setState({story: {...story, body: e.target.value}})}
-                                                   placeholder="Full Story . . ." required="true">
+                                                   value={product.body}
+                                                   onChange={(e) => this.setState({product: {...product, body: e.target.value}})}
+                                                   placeholder="Full Product . . ." required="true">
                                          </textarea>
                                     </div>
                                 </div>
@@ -236,11 +236,11 @@ class Home extends Component {
 
                                     <div className="col-sm-10">
                                         <input type="text" className="form-control" id="author" name="author"
-                                               value={story.author}
+                                               value={product.author}
                                                maxLength="225"
                                                onChange={(e) => this.setState({
-                                                   story: {
-                                                       ...story,
+                                                   product: {
+                                                       ...product,
                                                        author: e.target.value
                                                    }
                                                })}
@@ -267,17 +267,17 @@ class Home extends Component {
                     aria-labelledby="ModalHeader"
                 >
                     <Modal.Header closeButton>
-                        <Modal.Title id='ModalHeader'>Delete Story</Modal.Title>
+                        <Modal.Title id='ModalHeader'>Delete Product</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p>Are you want to Delete Story ?</p>
+                        <p>Are you want to Delete Product ?</p>
                     </Modal.Body>
                     <Modal.Footer>
                         <button className='btn btn-primary' type="button" onClick={() => this.handleDeleteDlgClose()}>
                             No
                         </button>
                         &nbsp; &nbsp;
-                        <button className='btn btn-primary' onClick={this.deleteStory}>
+                        <button className='btn btn-primary' onClick={this.deleteProduct}>
                             Yes
                         </button>
                     </Modal.Footer>
