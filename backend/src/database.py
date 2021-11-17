@@ -62,9 +62,9 @@ class Database:
 
         # check if the input item is avaialble in db
         cursor.execute(
-            'SELECT I.id, I.price FROM Items I, Stores S 
+            """SELECT I.id, I.price FROM Items I, Stores S 
              WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= %s 
-             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
+             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
             (store_loc, itemcode, quantity, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
@@ -89,9 +89,9 @@ class Database:
         
         # check if the input item is avaialble in db
         cursor.execute(
-            'SELECT * FROM Items I, Stores S 
+            """SELECT * FROM Items I, Stores S 
              WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0
-             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
+             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
             (store_loc, itemcode, quantity, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
@@ -119,16 +119,16 @@ class Database:
         
         # check if the input item is avaialble in db
         cursor.execute(
-            'SELECT * FROM Items I, Stores S 
+            """SELECT * FROM Items I, Stores S 
              WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0 
-             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
+             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
             (store_loc, itemcode, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
         if item_avail:
             item_id = item_avail[0]
             cursor.execute(
-                'UPDATE Items SET quantity = quantity + %s WHERE id = %d', (quantity, item_id)
+                """UPDATE Items SET quantity = quantity + %s WHERE id = %d""", (quantity, item_id)
             )
             mysql.connection.commit()
             msg = "Successfully item deleted"
@@ -148,7 +148,7 @@ class Database:
         # end if
         order_time = Utils.get_cur_time()
         cursor.execute(
-            'INSERT INTO Orders (order_date, username, items, order_type, price, address, shipping_method) VALUES (%s, %s, %s)',
+            """INSERT INTO Orders (order_date, username, items, order_type, price, address, shipping_method) VALUES (%s, %s, %s)""",
             (order_time, username, item_str, order_type, str(price), shipping_address, shipping_method)
         )
         mysql.connection.commit()

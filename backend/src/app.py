@@ -297,7 +297,7 @@ def payment(username):
         if len(invalie_elem)==0:
             msg = 'Valid payment info entered'
         else:
-            msg = "Invalid " + ",".join(invalid_elem) " info entered"
+            msg = "Invalid " + ",".join(invalid_elem) + " info entered"
         # end if
     # end if
     return jsonify(
