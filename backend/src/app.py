@@ -120,8 +120,182 @@ def register():
         msg=msg
     )
 
+# http://localhost:5000/api/register
+# this will be the registration page, we need to use both GET and POST requests
+@app.route('/api/<username>', methods=['GET', 'POST'])
+def update_password(username):
+    # Output message if something goes wrong...
+    msg = 'No input parameters'
+    #register_html = Macros.FRONTEND_DIR / 'register.html'
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'password' in request.form and \
+       'email' in request.form:
+        
+        # Create variables for easy access
+        hash_username = username
+        password = request.form['password']
+        hash_password = Utils.hashing(password)
+        email = request.form['email']
+        
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        
+        # If account exists show error and validation checks
+        account = Database.user_exists_in_db(cursor, mysql, hash_username)
+        if account:
+            if Utils.isvalid_password(password):
+                cursor, mysql, msg = Database.update_password_record(cursor, mysql, [hash_username, hash_password, email])
+            else:
+                msg = 'Invalid password format!'
+            # end if
+        else:
+            msg = 'Account is not registered'
+        # end if
+    # end if
+    cursor.close()
+    print(msg)
+    return jsonify(
+        msg=msg
+    )
+
 @app.route('/api/<username>', methods=['GET', 'POST'])
 def grocery(username):
+    msg = ''
+    stores = None
+    # check if the requested location exists
+    if request.method == 'POST' and 'city' in request.form:
+        msg = 
+        # Create variables for easy access
+        city = request.form['city']
+        state = request.form['state']
+        stores = Database.get_stores_exist_in_db(cursor, mysql, [city, state])
+        if stores:
+            # get store addresses
+            # stores = [s[1] for s in stors] 
+            msg = 'Successfully store set'
+        else:
+            msg = 'store not exists'
+        # end if
+    # end if
+    cursor.close()
+    return jsonify(
+        msg = msg,
+        stores = stores
+    )
+    
+def add_item(request):
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'item' in request.form and \
+       'add' in request.form and \
+       'store_address' in request.form and \
+       'city' in request.form and \
+       'state' in request.form:
+        
+        # Create variables for easy access
+        isadd = request.form['add']
+        itemname = request.form['item']
+        quantity = request.form['quantity']
+        store_address = request.form['store_address']
+        store_city = request.form['city']
+        store_state = request.form['state']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        if isadd:
+            # Check if item exists using MySQL
+            cursor, mysql, msg = Database.add_item_in_db(cursor, mysql, [itemname, quantity, store_address, store_city, store_state])
+        else:
+            msg = 'Addition failed'
+        # end if
+        cursor.close()
+    # end if    
+    return msg
+
+def update_item_quantity(request):
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'item' in request.form and \
+       'update' in request.form and \
+       'old_quantity' in request.form and \
+       'new_quantity' in request.form and \
+       'store_address' in request.form and \
+       'city' in request.form and \
+       'state' in request.form:
+        
+        # Create variables for easy access
+        isupdate = request.form['update']
+        itemname = request.form['item']
+        old_quantity = request.form['old_quantity']
+        new_quantity = request.form['new_quantity']
+        store_address = request.form['store_address']
+        store_city = request.form['city']
+        store_state = request.form['state']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        if isupdate:
+            cursor, mysql, msg = Database.update_item_in_db(cursor, mysql, [itemname, old_quantity, new_quantity, store_address, store_city, store_state])
+        else:
+            msg = 'Update failed'
+        # end if
+        cursor.close()
+    # end if
+    return msg
+
+def delete_item(request):
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and \
+       'item' in request.form and \
+       'delete' in request.form and \
+       'store_address' in request.form and \
+       'city' in request.form and \
+       'state' in request.form:
+        
+        # Create variables for easy access
+        isdelete = request.form['delete']
+        itemname = request.form['item']
+        quantity = request.form['quantity']
+        store_address = request.form['store_address']
+        store_city = request.form['city']
+        store_state = request.form['state']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        if isdelete:
+            cursor, mysql, msg = Database.add_item_in_db(cursor, mysql, [itemname, quantity, store_address, store_city, store_state])
+        else:
+            msg = 'Deletion failed'
+        # end if
+        cursor.close()
+    # end if
+    return msg
+
+# Http://localhost:5000/api/<username>/shopping
+@app.route('/api/<username>/shopping', methods=['GET', 'POST'])
+def items(username):
+    obj = None
+    msg = ''
+    request_type = ''
+    if request.method == 'POST' and 'type' in request.form:
+        request_type = request.form['type']
+        if request_type=='add':
+            obj = add_item(request)
+        elif request_type=='update':
+            obj = update_item_quantity(request)
+        elif request_type=='delete':
+            obj = delete_item(request)
+        # end if
+    # end if
+    return jsonify(
+        request_type=request_type
+        msg=msg
+    )
+
+# http://localhost:5000/api/<username>/payment
+@app.route('/api/<username>/payment', methods=['GET', 'POST'])
+def payment(username):
     msg = ''
     # check if the requested location exists
     if request.method == 'POST' and 'city' in request.form:
@@ -140,94 +314,6 @@ def grocery(username):
     return jsonify(
         msg = msg
     )
-
-
-# Http://localhost:5000/egrocerycart/register
-@app.route('/egrocerycart/shopping', methods=['GET', 'POST'])
-def add_item():
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-       'item' in request.form and \
-       'add' in request.form:
-        
-        # Create variables for easy access
-        isadd = request.form['add']
-        store_loc = request.form['location']
-        itemname = request.form['item']
-        quantity = request.form['quantity']
-
-        if isadd:
-            # Check if item exists using MySQL
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute(
-                'SELECT * FROM items WHERE location = %s AND itemname = %s AND quantity >= %s',
-                (store_loc, itemname, quantity)
-            )
-            isavail = cursor.fetchone()
-            if isavail:
-                cursor.execute(
-                    'UPDATE items SET quantity = quantity - %s WHERE location = %s AND itemname = %s',
-                    (quantity, store_loc, itemname)
-                )
-                mysql.connection.commit()
-                msg = 'Successfully added'
-            else:
-                msg = 'Item is not available'
-            # end if
-        else:
-            msg = 'Addition failed'
-        # end if
-    # end if    
-    return jsonify(
-        msg=msg
-    )
-
-# http://localhost:5000/egrocerycart/register
-@app.route('/api/shopping', methods=['GET', 'POST'])
-def delete_item():
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-       'item' in request.form and \
-       'delete' in request.form:
-        
-        # Create variables for easy access
-        isdelete = request.form['delete']
-        store_loc = request.form['location']
-        itemname = request.form['item']
-        quantity = request.form['quantity']
-
-        if isdelete:
-            # Check if item exists using MySQL
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute(
-                'SELECT * FROM items WHERE location = %s AND itemname = %s',
-                (store_loc, itemname)
-            )
-            isavail = cursor.fetchone()
-            if isavail:
-                # Check if item exists using MySQL
-                cursor.execute(
-                    'UPDATE items SET quantity = quantity + %s WHERE location = %s AND itemname = %s',
-                    (quantity, store_loc, itemname)
-                )
-                mysql.connection.commit()
-            else:
-                cursor.execute(
-                    'INSERT INTO items (location, itemname, quantity) VALUES (%s, %s, %s)',
-                    (store_loc, itemname, quantity)
-                )
-            # end if
-            msg = 'Successfully deleted'
-        else:
-            msg = 'Deletion failed'
-        # end if
-    # end if
-    return jsonify(
-        msg=msg
-    )
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
