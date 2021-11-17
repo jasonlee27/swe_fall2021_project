@@ -120,7 +120,29 @@ def register():
         msg=msg
     )
 
-# http://localhost:5000/egrocerycart/register
+@app.route('/api/<username>', methods=['GET', 'POST'])
+def grocery(username):
+    msg = ''
+    # check if the requested location exists
+    if request.method == 'POST' and 'city' in request.form:
+        msg = 
+        # Create variables for easy access
+        city = request.form['city']
+        state = request.form['state']
+        store = Database.store_exists_in_db(cursor, mysql, [city, state])
+        if store:
+            msg = 'Successfully store set'
+        else:
+            msg = 'store not exists'
+        # end if
+    # end if
+    cursor.close()
+    return jsonify(
+        msg = msg
+    )
+
+
+# Http://localhost:5000/egrocerycart/register
 @app.route('/egrocerycart/shopping', methods=['GET', 'POST'])
 def add_item():
     msg = ''

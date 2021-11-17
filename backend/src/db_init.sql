@@ -11,6 +11,18 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 INSERT INTO `accounts` (`id`, `username`, `password`, `email`) VALUES (1, 'test', 'test', 'test@test.com');
 
+CREATE TABLE IF NOT EXISTS `stores` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+  	`loc_city` varchar(50) NOT NULL,
+  	`loc_state` varchar(2) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+INSERT INTO `items` (`id`, `loc_city`, `loc_state`) VALUES (1, 'dallas', 'TX');
+INSERT INTO `items` (`id`, `loc_city`, `loc_state`) VALUES (2, 'richardson', 'TX');
+INSERT INTO `items` (`id`, `loc_city`, `loc_state`) VALUES (3, 'addison', 'TX');
+INSERT INTO `items` (`id`, `loc_city`, `loc_state`) VALUES (4, 'plano', 'TX');
+
 CREATE TABLE IF NOT EXISTS `items` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
   	`itemname` varchar(50) NOT NULL,

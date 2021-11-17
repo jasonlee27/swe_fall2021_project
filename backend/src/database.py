@@ -33,6 +33,16 @@ class Database:
         return cursor, mysql
 
     @classmethod
+    def store_exists_in_db(cls, cursor, mysql, location):
+        city, state = location[0], location[1]
+        cursor.execute('SELECT * FROM stores WHERE city = %s AND state = %s', (city, state))
+        store = cursor.fetchone()
+        if store:
+            return store
+        # end if
+        return
+    
+    @classmethod
     def delete_account_record(cls, cursor, mysql, data):
         pass
     
