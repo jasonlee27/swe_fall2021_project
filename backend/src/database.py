@@ -56,20 +56,21 @@ class Database:
         return
 
     @classmethod
-    def add_item_in_db(cls, cursor, mysql, data):
-        itemname, quantity = data[0], data[1]
-        store_add, store_city, store_state = data[2], data[3], data[4]
+    def add_item_order(cls, cursor, mysql, data):
+        itemcode, quantity, price = data[0], data[1], data[2]
+        item_price = 0.
 
         # check if the input item is avaialble in db
         cursor.execute(
-            'SELECT * FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemname = %s AND I.quantity >= %s 
+            'SELECT I.id, I.price FROM Items I, Stores S 
+             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= %s 
              AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
-            (store_loc, itemname, quantity, state_add, state_city, state_state)
+            (store_loc, itemcode, quantity, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
         if item_avail:
             item_id = item_avail[0]
+            item_price = item_avail[1]
             cursor.execute(
                 'UPDATE Items SET quantity = quantity - %s WHERE id = %d', (quantity, item_id)
             )
@@ -78,19 +79,20 @@ class Database:
         else:
             msg = "Item selected is not available"
         # end if
-        return cursor, mysql, msg
+        new_price = price + item_price*quantity
+        return cursor, mysql, msg, new_price
 
     @classmethod
-    def update_item_in_db(cls, cursor, mysql, data):
-        itemname, old_quantity, new_quantity = data[0], data[1], data[2]
-        store_add, store_city, store_state = data[3], data[4], data[5]
-
+    def update_item_order(cls, cursor, mysql, data):
+        itemcode, old_quantity, new_quantity, price = data[0], data[1], data[2], data[3]
+        item_price = 0.
+        
         # check if the input item is avaialble in db
         cursor.execute(
             'SELECT * FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemname = %s AND I.quantity >= 0
+             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0
              AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
-            (store_loc, itemname, quantity, state_add, state_city, state_state)
+            (store_loc, itemcode, quantity, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
         if item_avail:
@@ -106,19 +108,21 @@ class Database:
         else:
             msg = "Item selected is not available"
         # end if
-        return cursor, mysql, msg
+        
+        new_price = price - item_price*(old_quantity + new_quantity)
+        return cursor, mysql, msg, new_price
     
     @classmethod
-    def delete_item_in_db(cls, cursor, mysql, data):
-        itemname, quantity = data[0], data[1]
-        store_add, store_city, store_state = data[2], data[3], data[4]
-
+    def delete_item_order(cls, cursor, mysql, data):
+        itemcode, quantity, price = data[0], data[1], data[2]
+        item_price = 0.
+        
         # check if the input item is avaialble in db
         cursor.execute(
             'SELECT * FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemname = %s AND I.quantity >= 0 
+             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0 
              AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s',
-            (store_loc, itemname, state_add, state_city, state_state)
+            (store_loc, itemcode, state_add, state_city, state_state)
         )
         item_avail = cursor.fetchone()
         if item_avail:
@@ -131,10 +135,22 @@ class Database:
         else:
             msg = "Item selected is not available"
         # end if
-        return cursor, mysql, msg
+        new_price = price - item_price*quantity
+        return cursor, mysql, msg, new_price
     
     @classmethod
-    def update_account_record(cls, cursor, mysql, data):
-        pass
-
-    
+    def insert_order_record(cls, cursor, mysql, data):
+        username, item_list, order_type, price = data[0], data[1], data[2], data[3]
+        shipping_address, shipping_method = None, None
+        item_str = "|".join([f"{item[0]}::{item[1]}" for item in item_list])
+        if order_type == "delivery":
+            shipping_address, shipping_method = data[4], data[5]
+        # end if
+        order_time = Utils.get_cur_time()
+        cursor.execute(
+            'INSERT INTO Orders (order_date, username, items, order_type, price, address, shipping_method) VALUES (%s, %s, %s)',
+            (order_time, username, item_str, order_type, str(price), shipping_address, shipping_method)
+        )
+        mysql.connection.commit()
+        msg = "Order confirmed"
+        return cursor, mysql, msg

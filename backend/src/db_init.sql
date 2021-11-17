@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Accounts (
        username varchar(50) NOT NULL,
        password varchar(50) NOT NULL,
        email varchar(50) NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
     UNIQUE(username)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
@@ -48,13 +48,30 @@ CREATE TABLE IF NOT EXISTS Items (
     CONSTRAINT item_price_constraint CHECK (price>=0.0)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (1, 3, 'apple', '000000000001', 0.8, '12012021', 300, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (2, 3, 'eggs brown medium grade a', '000000000002', 4.29, '12012021', 200, 'richardson');
-INSERT INTO Items (id, itemname, itemcode, price, expirydate, quantity) VALUES (3, 'fat free greek yogurt', '000000000003', 5.49, '11222021', 200, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (4, 3, 'broccoli florets', '000000000004', 2.59, '11222021', 200, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (5, 4, 'peanut butter crunchy', '000000000005', 4.1, '11222022', 160, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (6, 4, 'baby spinach salad', '000000000006', 2.29, '11222021', 200, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (7, 1, 'water spring', '000000000007', 0.89, '11192021', 300, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (8, 2, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400, 'richardson');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (9, 5, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400, 'dallas');
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (10, 6, 'broccoli florets', '000000000004', 2.59, '11202021', 200, 'dallas');
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (1, 3, 'apple', '000000000001', 0.8, '12012021', 300);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (2, 3, 'eggs brown medium grade a', '000000000002', 4.29, '12012021', 200);
+INSERT INTO Items (id, itemname, itemcode, price, expirydate, quantity) VALUES (3, 'fat free greek yogurt', '000000000003', 5.49, '11222021', 200);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (4, 3, 'broccoli florets', '000000000004', 2.59, '11222021', 200);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (5, 4, 'peanut butter crunchy', '000000000005', 4.1, '11222022', 160);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (6, 4, 'baby spinach salad', '000000000006', 2.29, '11222021', 200);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (7, 1, 'water spring', '000000000007', 0.89, '11192021', 300);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (8, 2, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (9, 5, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400);
+INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (10, 6, 'broccoli florets', '000000000004', 2.59, '11202021', 200);
+
+
+-- Order Table
+CREATE TABLE IF NOT EXISTS Orders (
+	id int(11) NOT NULL AUTO_INCREMENT,
+  	order_date varchar(50) NOT NULL,
+        username  varchar(20) NOT NULL,
+  	items varchar(20) NOT NULL,
+        order_type varchar(20) NOT NULL,
+        price float(8,3) NOT NULL,
+        address varchar(50)
+        shipping_method varchar(20),
+    PRIMARY KEY (id),
+    FOREIGN KEY (username) REFERENCES Accounts(username),
+    CONSTRAINT order_type_constraint CHECK (order_type = 'pickup' OR order_type = 'delivery'),
+    CONSTRAINT price_constraint CHECK (price>=0.0),
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

@@ -46,9 +46,8 @@ def login():
         else:
             msg = 'Incorrect username/password!'
         # end if
+        cursor.close()
     # end if
-    
-    cursor.close()
     print(msg)
     return jsonify(
         msg=msg
@@ -64,6 +63,7 @@ def logout():
     session.pop('username', None)
     
     msg = 'Successfully logged out'
+    print(msg)
     return jsonify(
         msg=msg
     )
@@ -110,11 +110,11 @@ def register():
             Database.insert_account_record(cursor, mysql, [hash_username, hash_password, email])
             msg = 'Successfully registered'
         # end if
+        cursor.close()
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
     # end if
-    cursor.close()
     print(msg)
     return jsonify(
         msg=msg
@@ -137,23 +137,23 @@ def update_password(username):
         password = request.form['password']
         hash_password = Utils.hashing(password)
         email = request.form['email']
+
+        if Utils.isvalid_password(password):
+            # Check if account exists using MySQL
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        # Check if account exists using MySQL
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        
-        # If account exists show error and validation checks
-        account = Database.user_exists_in_db(cursor, mysql, hash_username)
-        if account:
-            if Utils.isvalid_password(password):
+            # If account exists show error and validation checks
+            account = Database.user_exists_in_db(cursor, mysql, hash_username)
+            if account:
                 cursor, mysql, msg = Database.update_password_record(cursor, mysql, [hash_username, hash_password, email])
             else:
-                msg = 'Invalid password format!'
+                msg = 'Account is not registered'
             # end if
+            cursor.close()
         else:
-            msg = 'Account is not registered'
+            msg = 'Invalid password format!'
         # end if
     # end if
-    cursor.close()
     print(msg)
     return jsonify(
         msg=msg
@@ -165,10 +165,11 @@ def grocery(username):
     stores = None
     # check if the requested location exists
     if request.method == 'POST' and 'city' in request.form:
-        msg = 
         # Create variables for easy access
         city = request.form['city']
         state = request.form['state']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        
         stores = Database.get_stores_exist_in_db(cursor, mysql, [city, state])
         if stores:
             # get store addresses
@@ -177,8 +178,9 @@ def grocery(username):
         else:
             msg = 'store not exists'
         # end if
+        cursor.close()
     # end if
-    cursor.close()
+    print(msg)
     return jsonify(
         msg = msg,
         stores = stores
@@ -188,108 +190,82 @@ def add_item(request):
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
-       'item' in request.form and \
-       'add' in request.form and \
-       'store_address' in request.form and \
-       'city' in request.form and \
-       'state' in request.form:
+       'itemcode' in request.form and \
+       'quantity' in request.form and \
+       'price' in request.form:
         
         # Create variables for easy access
-        isadd = request.form['add']
-        itemname = request.form['item']
+        itemcode = request.form['itemcode']
         quantity = request.form['quantity']
-        store_address = request.form['store_address']
-        store_city = request.form['city']
-        store_state = request.form['state']
+        price = request.form['price']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-        if isadd:
-            # Check if item exists using MySQL
-            cursor, mysql, msg = Database.add_item_in_db(cursor, mysql, [itemname, quantity, store_address, store_city, store_state])
-        else:
-            msg = 'Addition failed'
-        # end if
+        cursor, mysql, msg, new_price = Database.add_item_order(
+            cursor, mysql, [itemcode, quantity, price]
+        )
         cursor.close()
     # end if    
-    return msg
+    return msg, new_price
 
 def update_item_quantity(request):
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
-       'item' in request.form and \
-       'update' in request.form and \
+       'itemcode' in request.form and \
        'old_quantity' in request.form and \
        'new_quantity' in request.form and \
-       'store_address' in request.form and \
-       'city' in request.form and \
-       'state' in request.form:
+       'price' in request.form:
         
-        # Create variables for easy access
-        isupdate = request.form['update']
-        itemname = request.form['item']
+        itemcode = request.form['itemcode']
         old_quantity = request.form['old_quantity']
         new_quantity = request.form['new_quantity']
-        store_address = request.form['store_address']
-        store_city = request.form['city']
-        store_state = request.form['state']
+        price = request.form['price']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-        if isupdate:
-            cursor, mysql, msg = Database.update_item_in_db(cursor, mysql, [itemname, old_quantity, new_quantity, store_address, store_city, store_state])
-        else:
-            msg = 'Update failed'
-        # end if
+        cursor, mysql, msg, new_price = Database.update_item_order(
+            cursor, mysql, [itemcode, old_quantity, new_quantity, price]
+        )
         cursor.close()
     # end if
-    return msg
+    return msg, new_price
 
 def delete_item(request):
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
-       'item' in request.form and \
-       'delete' in request.form and \
-       'store_address' in request.form and \
-       'city' in request.form and \
-       'state' in request.form:
+       'itemcode' in request.form and \
+       'quantity' in request.form and \
+       'price' in request.form:
         
-        # Create variables for easy access
-        isdelete = request.form['delete']
-        itemname = request.form['item']
+        itemcode = request.form['itemcode']
         quantity = request.form['quantity']
-        store_address = request.form['store_address']
-        store_city = request.form['city']
-        store_state = request.form['state']
+        price = request.form['price']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-        if isdelete:
-            cursor, mysql, msg = Database.add_item_in_db(cursor, mysql, [itemname, quantity, store_address, store_city, store_state])
-        else:
-            msg = 'Deletion failed'
-        # end if
+        cursor, mysql, msg, new_price = Database.add_item_order(
+            cursor, mysql, [itemcode, quantity, price]
+        )
         cursor.close()
     # end if
-    return msg
+    return msg, new_price
 
 # Http://localhost:5000/api/<username>/shopping
 @app.route('/api/<username>/shopping', methods=['GET', 'POST'])
 def items(username):
-    obj = None
     msg = ''
     request_type = ''
     if request.method == 'POST' and 'type' in request.form:
         request_type = request.form['type']
+        current_total = request.form['total_price']
         if request_type=='add':
-            obj = add_item(request)
+            msg, new_price = add_item(request)
         elif request_type=='update':
-            obj = update_item_quantity(request)
+            msg, new_price = update_item_quantity(request)
         elif request_type=='delete':
-            obj = delete_item(request)
+            msg, new_price = delete_item(request)
         # end if
     # end if
+    print(msg)
     return jsonify(
-        request_type=request_type
+        request_type=request_type,
+        price=new_price,
         msg=msg
     )
 
@@ -297,20 +273,66 @@ def items(username):
 @app.route('/api/<username>/payment', methods=['GET', 'POST'])
 def payment(username):
     msg = ''
-    # check if the requested location exists
-    if request.method == 'POST' and 'city' in request.form:
-        msg = 
-        # Create variables for easy access
-        city = request.form['city']
-        state = request.form['state']
-        store = Database.store_exists_in_db(cursor, mysql, [city, state])
-        if store:
-            msg = 'Successfully store set'
+    if request.method == 'POST' and \
+       'card_number' in request.form and \
+       'exp_date' in request.form and \
+       'security_code' in request.form:    
+
+        card_number = request.form['card_number']
+        exp_date = request.form['exp_date']
+        security_code = request.form['security_code']
+        invalid_elem = list()
+        if not Utils.isvalid_card_number(card_number):
+            invalid_elem.append('Card number')
+        # end if
+
+        if not Utils.isvalid_exp_date(exp_date):
+            invalid_elem.append("Expiration date")
+        # end if
+
+        if not Utils.isvalid_sec_code(security_code):
+            invalid_elem.append("Security code")
+        # end if
+        
+        if len(invalie_elem)==0:
+            msg = 'Valid payment info entered'
         else:
-            msg = 'store not exists'
+            msg = "Invalid " + ",".join(invalid_elem) " info entered"
         # end if
     # end if
-    cursor.close()
+    return jsonify(
+        msg = msg
+    )
+
+
+# http://localhost:5000/api/<username>/payment
+@app.route('/api/<username>/orders', methods=['GET', 'POST'])
+def orders(username):
+    msg = ''
+    if request.method == 'POST' and \
+       'item_list' in request.form and \
+       'order_type' in request.form:
+
+        item_list = request.form['item_list'] # List of tuples (itemname, quantity)
+        order_type = request.form['order_type']
+        total_price = request.form['price']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        if order_type=="pickup":
+            est_wait_time = "10min"
+            cursor, mysql, msg = Database.insert_order_record(
+                cursor, mysql,
+                [username, item_list, order_type, total_price]
+            )
+        elif order_type=="delivery":
+             address = request.form['address']
+             shipping_method = request.form['shipping_method']
+             cursor, mysql, msg = Database.insert_order_record(
+                 cursor, mysql,
+                 [username, item_list, order_type, total_price, address, shipping_method]
+             )
+        # end if
+        cursor.close()
+    # end if
     return jsonify(
         msg = msg
     )
