@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_mysqldb import MySQL
+from flask_cors import CORS, cross_origin
 
 from macros import Macros
 from utils import Utils
@@ -13,11 +14,15 @@ app.secret_key = Macros.SECRETE_KEY
 # DB connection details
 # app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
 app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
 Macros.DB_DIR.mkdir(parents=True, exist_ok=True)
+
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+@cross_origin()
 
 @app.route("/api/status", methods=['GET'])
 def status():

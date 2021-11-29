@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import Modal from "react-bootstrap/lib/Modal";
 import {errorMsg, successMsg} from '../../components/notification/ToastNotification';
+import Products from '../../components/products/Products';
 import Pagination from 'react-bootstrap/lib/Pagination';
 import api from '../../api';
 
@@ -15,7 +16,12 @@ class Home extends Component {
                 code:'',
                 price:''
             },
-            products: [],
+            products: [{
+                id: 0,
+                name:'gg',
+                code:'gg',
+                price:'10'
+            }],
             updateDlgFlg: false,
             deleteDlgFlg: false,
             current: 0,
@@ -172,10 +178,10 @@ class Home extends Component {
                             <div className="col-md-12">
                                 <div className="product-header">
                                     <h2><strong>Products</strong></h2>
+                                    <Products productsData={this.state.products}/>
                                 </div>
                             </div>
                             <div className="col-md-12">
-                                {productsComponent}
                                 <div className="pagination-div">
                                     <span>Total Products: {totalElements}</span><br/>
                                     <Pagination bsSize="medium">
@@ -188,6 +194,7 @@ class Home extends Component {
                         </div>
                     </div>
                 </div>
+                
 
                 <Modal
                     show={updateDlgFlg}
@@ -270,7 +277,7 @@ class Home extends Component {
                         <Modal.Title id='ModalHeader'>Delete Product</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p>Are you want to Delete Product ?</p>
+                        <p>Do want to Delete Product ?</p>
                     </Modal.Body>
                     <Modal.Footer>
                         <button className='btn btn-primary' type="button" onClick={() => this.handleDeleteDlgClose()}>

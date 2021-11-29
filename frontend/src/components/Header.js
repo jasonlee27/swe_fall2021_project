@@ -14,13 +14,12 @@ const Header = () => (
                         <span className="icon-bar"></span>
                         <span className="icon-bar"></span>
                     </button>
-                    <Link className="navbar-brand" to='/create'>Stories</Link>
+                    <Link className="navbar-brand" to='/'>Home</Link>
                 </div>
                 <div id="navbar" className="navbar-collapse collapse">
                     <ul className="nav navbar-nav">
-                        <li ><Link to='/'>Home</Link></li>
-                        <li ><Link to='/create'>Create Story</Link></li>
-                        <li ><Link to='/search'>Search</Link></li>
+                        <li ><Link to='/profile'>Profile</Link></li>
+                        <li ><Link to='/location'>Location</Link></li>
                         <li ><a href="#" onClick={() => {sessionStorage.removeItem('token'); window.location = '/login'}}>Logout</a></li>
                     </ul>
                 </div>

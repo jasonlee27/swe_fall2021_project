@@ -18,6 +18,7 @@ class Login extends Component {
                 password: '',
                 email: ''
             },
+            products: '',
             openDlgFlg: false
         }
     }
@@ -28,6 +29,7 @@ class Login extends Component {
         var bodyFormData = new FormData();
         bodyFormData.append('username', this.state.registration.userName);
         bodyFormData.append('password', this.state.registration.password);
+        //self.props.history.push('/');
         api.post('/api/login', bodyFormData)
             .then(function (response) {
                 //---set Authorization header ---
@@ -59,6 +61,7 @@ class Login extends Component {
                     successMsg('User Registration Successful.');
                     self.setEmptyRegistrationState();
                     self.handleDlgClose();
+                    self.props.history.push('/login');
             })
             .catch(function (error) {
                 console.log("user registration error response  :: ", JSON.stringify(error));
