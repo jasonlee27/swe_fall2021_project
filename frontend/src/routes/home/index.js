@@ -16,12 +16,7 @@ class Home extends Component {
                 code:'',
                 price:''
             },
-            products: [{
-                id: 0,
-                name:'gg',
-                code:'gg',
-                price:'10'
-            }],
+            products: [],
             updateDlgFlg: false,
             deleteDlgFlg: false,
             current: 0,
@@ -41,20 +36,30 @@ class Home extends Component {
 
     loadProducts = () => {
         let self = this;
-        api.get('/api/products', { params: {page : self.state.current, limit : self.state.limit }})
-            .then(function (response) {
-                console.log("products success response :: ", response.data);
-                self.setState({products: []});
-                self.setState({products: self.state.products.concat(response.data.content)});
-                self.setState({current: response.data.number});
-                self.setState({totalPages: response.data.totalPages-1});
-                self.setState({totalElements: response.data.totalElements});
-            })
-            .catch(function (error) {
-                console.log("products error response :: ", error);
-            });
+        //api.get('/api/products', { params: {page : self.state.current, limit : self.state.limit }})
+        //    .then(function (response) {
+        //        console.log("products success response :: ", response.data);
+        //        self.setState({products: []});
+        //        self.setState({products: self.state.products.concat(response.data.content)});
+        //        self.setState({current: response.data.number});
+        //        self.setState({totalPages: response.data.totalPages-1});
+        //        self.setState({totalElements: response.data.totalElements});
+        //    })
+        //    .catch(function (error) {
+        //        console.log("products error response :: ", error);
+        //    });
 
-
+        self.setState({ products: [{
+            id: 0,
+            name:'gg',
+            code:'gg',
+            price:'10'
+        },{
+            id: 1,
+            name:'gg',
+            code:'gg',
+            price:'10'
+        }]});
     };
 
     addProduct = (e) => {
@@ -157,18 +162,18 @@ class Home extends Component {
             );
         }
 
-        let productsComponent = products.map((product) =>
-            <div className="product">
-                <h4><strong>{product.title}</strong></h4>
-                <p>{product.body}</p>
-                By <strong>{product.author}</strong>
-                <br/> <br/>
-                <button className='btn btn-primary' onClick={() => this.handleUpdateDlgShow(product)}> Update</button>
-                &nbsp; &nbsp; &nbsp;
-                <button className='btn btn-primary' onClick={() => this.handleDeleteDlgShow(product)}> Delete</button>
-                <hr/>
-            </div>
-        );
+        //let productsComponent = products.map((product) =>
+        //    <div className="product">
+        //        <h4><strong>{product.id}</strong></h4>
+        //        <p>{product.body}</p>
+        //        By <strong>{product.name}</strong>
+        //        <br/> <br/>
+        //        <button className='btn btn-primary' onClick={() => this.handleUpdateDlgShow(product)}> Update</button>
+        //        &nbsp; &nbsp; &nbsp;
+        //        <button className='btn btn-primary' onClick={() => this.handleDeleteDlgShow(product)}> Delete</button>
+        //        <hr/>
+        //    </div>
+        //);
 
         return (
             <div>
@@ -214,7 +219,7 @@ class Home extends Component {
                                     <div className="col-sm-10">
                                         <input type="text" className="form-control" id="title" name="title"
                                                placeholder="Title"
-                                               value={product.title}
+                                               value={product.id}
                                                maxLength="512"
                                                onChange={(e) => this.setState({
                                                    product: {
@@ -243,7 +248,7 @@ class Home extends Component {
 
                                     <div className="col-sm-10">
                                         <input type="text" className="form-control" id="author" name="author"
-                                               value={product.author}
+                                               value={product.name}
                                                maxLength="225"
                                                onChange={(e) => this.setState({
                                                    product: {

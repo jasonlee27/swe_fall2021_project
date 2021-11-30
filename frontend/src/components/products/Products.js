@@ -7,8 +7,8 @@ class Products extends Component {
     render() {
         const productList = this.props.productsData.map((product) =>
             <ProductItem key={product.id}
-                         title={product.title}
-                         description={product.description}/>
+                         title={product.name}
+                         description={product.code}/>
         );
 
         return (
