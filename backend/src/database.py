@@ -57,20 +57,22 @@ class Database:
 
     @classmethod
     def add_item_order(cls, cursor, mysql, data):
-        itemcode, quantity, price = data[0], data[1], data[2]
+        itemcode, quantity = data[0], data[1]
+        store_address, store_city, store_state = data[2], data[3], data[4]
         item_price = 0.
-
+        item_name = ''
         # check if the input item is avaialble in db
         cursor.execute(
-            """SELECT I.id, I.price FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= %s 
+            """SELECT I.id, I.price, I.itemname FROM Items I, Stores S 
+             WHERE I.itemcode = %s AND I.quantity >= %s 
              AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
-            (store_loc, itemcode, quantity, state_add, state_city, state_state)
+            (store_loc, itemcode, quantity, store_address, store_city, store_state)
         )
         item_avail = cursor.fetchone()
         if item_avail:
             item_id = item_avail[0]
             item_price = item_avail[1]
+            item_name = item_avail[2]
             cursor.execute(
                 'UPDATE Items SET quantity = quantity - %s WHERE id = %d', (quantity, item_id)
             )
@@ -79,64 +81,58 @@ class Database:
         else:
             msg = "Item selected is not available"
         # end if
-        new_price = price + item_price*quantity
-        return cursor, mysql, msg, new_price
+        return cursor, mysql, msg, item_name, item_price
 
     @classmethod
     def update_item_order(cls, cursor, mysql, data):
-        itemcode, old_quantity, new_quantity, price = data[0], data[1], data[2], data[3]
-        item_price = 0.
-        
+        itemcode, old_quantity, new_quantity, old_total_price = data[0], data[1], data[2], data[3]
+        store_address, store_city, store_state = data[4], data[5], data[6]
+        item_price, new_total_price = 0., 0.
+        item_name = ''
         # check if the input item is avaialble in db
-        cursor.execute(
-            """SELECT * FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0
-             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
-            (store_loc, itemcode, quantity, state_add, state_city, state_state)
-        )
-        item_avail = cursor.fetchone()
-        if item_avail:
-            item_id = item_avail[0]
+        if old_quantity>new_quantity: # deletion
             cursor.execute(
-                'UPDATE Items SET quantity = quantity + %s WHERE id = %d', (old_quantity, item_id)
+                """SELECT I.id, I.price, I.itemname FROM Items I, Stores S 
+                WHERE I.itemcode = %s AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
+                (itemcode, state_add, state_city, state_state)
             )
+            item_avail = cursor.fetchone()
+            if item_avail:
+                item_id = item_avail[0]
+                item_price = item_avail[1]
+                item_name = item_avail[2]
+                cursor.execute(
+                    'UPDATE Items SET quantity = quantity + %s WHERE id = %d', (old_quantity-new_quantity, item_id)
+                )
+                mysql.connection.commit()
+                new_total_price =  old_total_price - item_price*(old_quantity-new_quantity)
+                msg = "Successfully item updated"
+            else:
+                msg = "Item selected is not available"
+            # end if
+        elif old_quantity<new_quantity: # addition
             cursor.execute(
-                'UPDATE Items SET quantity = quantity - %s WHERE id = %d', (new_quantity, item_id)
+                """SELECT I.id, I.price, I.itemname FROM Items I, Stores S 
+                WHERE I.itemcode = %s AND I.quantity >= %s 
+                AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
+                (itemcode, new_quantity-old_quantity, store_address, store_city, store_state)
             )
-            mysql.connection.commit()
-            msg = "Successfully item updated"
-        else:
-            msg = "Item selected is not available"
+            item_avail = cursor.fetchone()
+            if item_avail:
+                item_id = item_avail[0]
+                item_price = item_avail[1]
+                item_name = item_avail[2]
+                cursor.execute(
+                    'UPDATE Items SET quantity = quantity - %s WHERE id = %d', (new_quantity-old_quantity, item_id)
+                )
+                mysql.connection.commit()
+                new_total_price =  old_total_price + item_price*(new_quantity-old_quantity)
+                msg = "Successfully item updated"
+            else:
+                msg = "Item selected is not available"
+            # end if
         # end if
-        
-        new_price = price - item_price*(old_quantity + new_quantity)
-        return cursor, mysql, msg, new_price
-    
-    @classmethod
-    def delete_item_order(cls, cursor, mysql, data):
-        itemcode, quantity, price = data[0], data[1], data[2]
-        item_price = 0.
-        
-        # check if the input item is avaialble in db
-        cursor.execute(
-            """SELECT * FROM Items I, Stores S 
-             WHERE I.location = %s AND I.itemcode = %s AND I.quantity >= 0 
-             AND S.id=I.store_id AND S.address = %s AND S.loc_city = %s AND S.loc_state = %s""",
-            (store_loc, itemcode, state_add, state_city, state_state)
-        )
-        item_avail = cursor.fetchone()
-        if item_avail:
-            item_id = item_avail[0]
-            cursor.execute(
-                """UPDATE Items SET quantity = quantity + %s WHERE id = %d""", (quantity, item_id)
-            )
-            mysql.connection.commit()
-            msg = "Successfully item deleted"
-        else:
-            msg = "Item selected is not available"
-        # end if
-        new_price = price - item_price*quantity
-        return cursor, mysql, msg, new_price
+        return cursor, mysql, msg, item_name, item_price, new_total_price
     
     @classmethod
     def insert_order_record(cls, cursor, mysql, data):

@@ -14,7 +14,7 @@ app.secret_key = Macros.SECRETE_KEY
 # DB connection details
 # app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
 app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
@@ -30,6 +30,9 @@ def status():
 
 @app.route('/api/login', methods=['GET', 'POST'])
 def login():
+    # test username: jasonlee123
+    # test password: Password2021!@
+    # test email: jxl115330@abc.com
     msg = ''
     if request.method =='POST' and \
        'username' in request.form and \
@@ -46,7 +49,7 @@ def login():
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
             session['id'] = account['id']
-            session['username'] = account['username']
+            session['username'] = username
             msg = "Successfully logged in!"
         else:
             msg = 'Incorrect username/password!'
@@ -66,6 +69,9 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
+    session.pop('store_address', None)
+    session.pop('store_city', None)
+    session.pop('store_state', None)
     
     msg = 'Successfully logged out'
     print(msg)
@@ -79,7 +85,7 @@ def logout():
 def register():
     # Output message if something goes wrong...
     msg = 'No input parameters'
-    #register_html = Macros.FRONTEND_DIR / 'register.html'
+    # register_html = Macros.FRONTEND_DIR / 'register.html'
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
        'username' in request.form and\
@@ -127,18 +133,19 @@ def register():
 
 # http://localhost:5000/api/register
 # this will be the registration page, we need to use both GET and POST requests
-@app.route('/api/<username>', methods=['GET', 'POST'])
-def update_password(username):
+@app.route('/api/profile/updatepassword', methods=['GET', 'POST'])
+def update_password():
     # Output message if something goes wrong...
     msg = 'No input parameters'
     #register_html = Macros.FRONTEND_DIR / 'register.html'
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
+    if session['loggedin'] and \
+       request.method == 'POST' and \
        'password' in request.form and \
        'email' in request.form:
         
         # Create variables for easy access
-        hash_username = username
+        hash_username = Utils.hashing(session['username'])
         password = request.form['password']
         hash_password = Utils.hashing(password)
         email = request.form['email']
@@ -164,12 +171,14 @@ def update_password(username):
         msg=msg
     )
 
-@app.route('/api/<username>', methods=['GET', 'POST'])
-def grocery(username):
+@app.route('/api/profile/store', methods=['GET', 'POST'])
+def store(username):
     msg = ''
     stores = None
     # check if the requested location exists
-    if request.method == 'POST' and 'city' in request.form:
+    if session['loggedin'] and \
+       request.method == 'POST' and \
+       'city' in request.form:
         # Create variables for easy access
         city = request.form['city']
         state = request.form['state']
@@ -178,7 +187,10 @@ def grocery(username):
         stores = Database.get_stores_exist_in_db(cursor, mysql, [city, state])
         if stores:
             # get store addresses
-            # stores = [s[1] for s in stors] 
+            # stores = [s[1] for s in stors]
+            session['store_address'] = stores[1]
+            session['store_city'] = city
+            session['store_state'] = state
             msg = 'Successfully store set'
         else:
             msg = 'store not exists'
@@ -191,86 +203,103 @@ def grocery(username):
         stores = stores
     )
     
-def add_item(request):
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-       'itemcode' in request.form and \
-       'quantity' in request.form and \
-       'price' in request.form:
-        
-        # Create variables for easy access
-        itemcode = request.form['itemcode']
-        quantity = request.form['quantity']
-        price = request.form['price']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor, mysql, msg, new_price = Database.add_item_order(
-            cursor, mysql, [itemcode, quantity, price]
-        )
-        cursor.close()
-    # end if    
-    return msg, new_price
 
-def update_item_quantity(request):
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-       'itemcode' in request.form and \
-       'old_quantity' in request.form and \
-       'new_quantity' in request.form and \
-       'price' in request.form:
+# def delete_item(request):
+#     msg = ''
+#     # Check if "username", "password" and "email" POST requests exist (user submitted form)
+#     if request.method == 'POST' and \
+#        'itemcode' in request.form and \
+#        'quantity' in request.form and \
+#        'price' in request.form:
         
-        itemcode = request.form['itemcode']
-        old_quantity = request.form['old_quantity']
-        new_quantity = request.form['new_quantity']
-        price = request.form['price']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor, mysql, msg, new_price = Database.update_item_order(
-            cursor, mysql, [itemcode, old_quantity, new_quantity, price]
-        )
-        cursor.close()
-    # end if
-    return msg, new_price
+#         itemcode = request.form['itemcode']
+#         quantity = request.form['quantity']
+#         price = request.form['price']
+#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#         cursor, mysql, msg, new_price = Database.add_item_order(
+#             cursor, mysql, [itemcode, quantity, price]
+#         )
+#         cursor.close()
+#     # end if
+# return msg, new_price
 
-def delete_item(request):
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and \
-       'itemcode' in request.form and \
-       'quantity' in request.form and \
-       'price' in request.form:
-        
-        itemcode = request.form['itemcode']
-        quantity = request.form['quantity']
-        price = request.form['price']
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor, mysql, msg, new_price = Database.add_item_order(
-            cursor, mysql, [itemcode, quantity, price]
-        )
-        cursor.close()
-    # end if
-    return msg, new_price
+def add_item(itemcode, quantity, store_address, store_city, store_state):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor, mysql, msg, item_name, item_price = Database.add_item_order(
+        cursor, mysql, [itemcode, quantity, store_address, store_city, store_state]
+    )
+    cursor.close()
+    return msg, item_name, item_price
 
-# Http://localhost:5000/api/<username>/shopping
-@app.route('/api/<username>/shopping', methods=['GET', 'POST'])
-def items(username):
+# Http://localhost:5000/api/profile/shopping
+@app.route('/api/profile/shopping', methods=['GET', 'POST'])
+def scan_item():
     msg = ''
-    request_type = ''
-    if request.method == 'POST' and 'type' in request.form:
-        request_type = request.form['type']
-        current_total = request.form['total_price']
-        if request_type=='add':
-            msg, new_price = add_item(request)
-        elif request_type=='update':
-            msg, new_price = update_item_quantity(request)
-        elif request_type=='delete':
-            msg, new_price = delete_item(request)
-        # end if
+    item_name=''
+    if session['loggedin'] and \
+       session['store_address'] is not None and \
+       session['store_city'] is not None and \
+       session['store_state'] is not None and \
+       request.method == 'POST' and \
+       'itemcode' in request.form:
+        username = session['username']
+        itemcode = request.form['itemcode']
+        store_address = session['store_address']
+        store_city = session['store_city']
+        store_state = session['store_state']
+        msg, item_name, item_price = add_item(
+            itemcode, 1, store_address, store_city, store_state
+        )
     # end if
     print(msg)
     return jsonify(
-        request_type=request_type,
-        price=new_price,
+        itemname=item_name,
+        itemprice=item_price,
+        msg=msg
+    )
+
+def update_item(
+        itemcode,
+        prev_quantity, new_quantity,
+        prev_total_price,
+        store_address, store_city, store_state):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor, mysql, msg, item_name, item_price, new_total_price = Database.update_item_order(
+        cursor, mysql, [
+            itemcode, prev_quantity, new_quantity, prev_total_price,
+            store_address, store_city, store_state
+        ]
+    )
+    cursor.close()
+    return msg, item_name, item_price, new_total_price
+
+@app.route('/api/profile/shopping', methods=['GET', 'POST'])
+def edit_item():
+    msg = ''
+    if session['loggedin'] and \
+       session['store_address'] is not None and \
+       session['store_city'] is not None and \
+       session['store_state'] is not None and \
+       request.method == 'POST' and \
+       'itemcode' in request.form and \
+       'prev_quantity' in request.form and \
+        'new_quantity' in request.form and \
+        'prev_total_price' in request.form:
+        username = session['username']
+        itemcode = request.form['itemcode']
+        prev_quantity = request.form['prev_quantity']
+        new_quantity = request.form['new_quantity']
+        prev_total_price = request.form['prev_total_price']
+        msg, item_name, item_price, new_total_price = update_item(
+            itemcode, prev_quantity, new_quantity, prev_total_price,
+            store_address, store_city, store_state
+        )
+    # end if
+    print(msg)
+    return jsonify(
+        itemname=item_name,
+        itemprice=item_price,
+        total=new_total_price,
         msg=msg
     )
 
@@ -301,6 +330,10 @@ def payment(username):
         
         if len(invalie_elem)==0:
             msg = 'Valid payment info entered'
+            # pop the store selected when the shopping is done
+            session.pop('store_address', None)
+            session.pop('store_city', None)
+            session.pop('store_state', None)
         else:
             msg = "Invalid " + ",".join(invalid_elem) + " info entered"
         # end if
