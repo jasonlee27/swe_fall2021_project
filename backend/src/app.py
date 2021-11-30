@@ -202,26 +202,6 @@ def store(username):
         msg = msg,
         stores = stores
     )
-    
-
-# def delete_item(request):
-#     msg = ''
-#     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-#     if request.method == 'POST' and \
-#        'itemcode' in request.form and \
-#        'quantity' in request.form and \
-#        'price' in request.form:
-        
-#         itemcode = request.form['itemcode']
-#         quantity = request.form['quantity']
-#         price = request.form['price']
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor, mysql, msg, new_price = Database.add_item_order(
-#             cursor, mysql, [itemcode, quantity, price]
-#         )
-#         cursor.close()
-#     # end if
-# return msg, new_price
 
 def add_item(itemcode, quantity, store_address, store_city, store_state):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
