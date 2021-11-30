@@ -69,9 +69,6 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
-    session.pop('store_address', None)
-    session.pop('store_city', None)
-    session.pop('store_state', None)
     
     msg = 'Successfully logged out'
     print(msg)
