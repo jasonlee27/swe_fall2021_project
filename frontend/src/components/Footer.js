@@ -3,7 +3,7 @@ import React from 'react';
 const Footer = () => (
     <footer >
         <p>
-            &copy; 2019 Story Portal &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a>
+            &copy; 2019 Team Rocket &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a>
         </p>
     </footer>
 );

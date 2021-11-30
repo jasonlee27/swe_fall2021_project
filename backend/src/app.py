@@ -12,9 +12,9 @@ app = Flask(__name__)
 app.secret_key = Macros.SECRETE_KEY
 
 # DB connection details
-# app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
+app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
 app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
@@ -34,6 +34,7 @@ def login():
     # test password: Password2021!@
     # test email: jxl115330@abc.com
     msg = ''
+    code = 500
     if request.method =='POST' and \
        'username' in request.form and \
        'password' in request.form:
@@ -50,6 +51,7 @@ def login():
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = username
+            code = 200
             msg = "Successfully logged in!"
         else:
             msg = 'Incorrect username/password!'
@@ -58,6 +60,7 @@ def login():
     # end if
     print(msg)
     return jsonify(
+        code=code,
         msg=msg
     )
 

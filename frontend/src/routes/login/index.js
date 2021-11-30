@@ -32,14 +32,19 @@ class Login extends Component {
         //self.props.history.push('/');
         api.post('/api/login', bodyFormData)
             .then(function (response) {
-                //---set Authorization header ---
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
-                //token store in session storage
-                sessionStorage.setItem('token', response.data.token);
-                self.props.history.push('/');
+                if(response.data.code == 200) {
+                    //---set Authorization header ---
+                    axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
+                    //token store in session storage
+                    sessionStorage.setItem('token', response.data.token);
+                    self.props.history.push('/');
+                } else {
+                    errorMsg(response.data.msg);
+                    self.props.history.push('/login');
+                }
             })
             .catch(function (error) {
-                errorMsg('Invalid Credentials! Please Enter Valid Credentials.');
+                errorMsg('Issue with the internal system');
                 console.log("login error response :: ", error);
             });
     };

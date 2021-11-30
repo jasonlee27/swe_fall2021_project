@@ -60,6 +60,9 @@ class Home extends Component {
             code:'gg',
             price:'10'
         }]});
+        self.setState({current: 2});
+        self.setState({totalPages: 1});
+        self.setState({totalElements: 2});
     };
 
     addProduct = (e) => {
