@@ -59,11 +59,11 @@ class Login extends Component {
         bodyFormData.append('password', this.state.registration.password);
         api.post('/api/register', bodyFormData)
             .then(function (response) {
-                if (response.status === 302)
-                    warnMsg(response);
+                if (response.data.code === 400)
+                    warnMsg(response.data.msg);
                 else
                     console.log('user registration success response :: ', response);
-                    successMsg('User Registration Successful.');
+                    successMsg(response.data.msg);
                     self.setEmptyRegistrationState();
                     self.handleDlgClose();
                     self.props.history.push('/login');

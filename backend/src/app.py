@@ -85,6 +85,7 @@ def logout():
 def register():
     # Output message if something goes wrong...
     msg = 'No input parameters'
+    code = 400
     # register_html = Macros.FRONTEND_DIR / 'register.html'
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' and \
@@ -115,6 +116,7 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
+            code = 200
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
             # cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (hash_username, hash_password, email,))
             # mysql.connection.commit()
@@ -128,6 +130,7 @@ def register():
     # end if
     print(msg)
     return jsonify(
+        code=code,
         msg=msg
     )
 
