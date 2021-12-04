@@ -40,8 +40,8 @@ def login():
        'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        #username = Utils.hashing(username)
-        #password = Utils.hashing(password)
+        username = Utils.hashing(username)
+        password = Utils.hashing(password)
         
         # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

@@ -27,8 +27,8 @@ class Login extends Component {
         e.preventDefault();
         let self = this;
         var bodyFormData = new FormData();
-        bodyFormData.append('username', this.state.registration.userName);
-        bodyFormData.append('password', this.state.registration.password);
+        bodyFormData.append('username', this.state.login.username);
+        bodyFormData.append('password', this.state.login.password);
         //self.props.history.push('/');
         api.post('/api/login', bodyFormData)
             .then(function (response) {
