@@ -36,7 +36,6 @@ class Home extends Component {
 
     loadProducts = () => {
         let self = this;
-        console.log("load products")
         //api.get('/api/products', { params: {page : self.state.current, limit : self.state.limit }})
         //    .then(function (response) {
         //        console.log("products success response :: ", response.data);
@@ -50,7 +49,7 @@ class Home extends Component {
         //        console.log("products error response :: ", error);
         //    });
 
-        self.setState({ productsData: [{
+        self.setState({ products: [{
             id: 0,
             name:'gg',
             code:'gg',
