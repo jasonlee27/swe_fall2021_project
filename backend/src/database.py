@@ -26,7 +26,7 @@ class Database:
         # query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         # data: [hash_username, hash_password, email]
         cursor.execute(
-            'INSERT INTO Accounts (username, password, email) VALUES (%s, %s, %s)',
+            'INSERT IGNORE INTO Accounts (username, password, email) VALUES (%s, %s, %s)',
             (data[0], data[1], data[2])
         )
         mysql.connection.commit()

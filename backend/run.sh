@@ -21,6 +21,7 @@ function main_linux() {
         # sudo service mysql status
         mysql -u root < ${DB_INIT_FILE}
         (cd ${SRC_DIR}
+         python -m pytest
          python app.py
         )
         service mysql stop # stop mysql server
@@ -31,6 +32,7 @@ function main_macos() {
         mysql.server start
         mysql -u root < ${DB_INIT_FILE}
         (cd ${SRC_DIR}
+         python -m pytest
          python app.py
         )
         mysql.server stop

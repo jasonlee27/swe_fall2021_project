@@ -14,7 +14,7 @@ app.secret_key = Macros.SECRETE_KEY
 # DB connection details
 app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
 app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
