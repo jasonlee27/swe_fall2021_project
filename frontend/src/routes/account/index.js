@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import {errorMsg, successMsg} from '../../components/notification/ToastNotification';
-import Pagination from 'react-bootstrap/lib/Pagination';
 import api from '../../api';
 
 
@@ -9,8 +8,8 @@ class Account extends Component {
         super(props);
         this.state = {
             profile: {
-                name:'',
-                email:'',
+                name:'None',
+                email:'None',
                 payment:[],
                 address: [],
             }
@@ -42,8 +41,8 @@ class Account extends Component {
 
         self.setState({
             profile: {
-                name:'',
-                email:'',
+                name:'None',
+                email:'None',
                 payment:[],
                 address: [],
             },
@@ -108,13 +107,13 @@ class Account extends Component {
     };
 
     render() {
-        const {products, product, updateDlgFlg, deleteDlgFlg, current, totalPages, totalElements} = this.state;
-        let productItem = [];
-        for (let number = 0; number <= totalPages; number++) {
-            productItem.push(
-                <Pagination.Item active={number === current} onClick={() => this.onPaginationChange(number)}>{number+1}</Pagination.Item>
-            );
-        }
+        const profile = this.state;
+        //let productItem = [];
+        //for (let number = 0; number <= totalPages; number++) {
+        //    productItem.push(
+        //        <Pagination.Item active={number === current} onClick={() => this.onPaginationChange(number)}>{number+1}</Pagination.Item>
+        //    );
+        //}
 
         return (
             <div>
@@ -125,6 +124,19 @@ class Account extends Component {
                                 <div className="product-header">
                                     <h2><strong>Profile</strong></h2>
                                 </div>
+                            </div>
+                            <div className="col-md-12">
+                            <div className="form-horizontal" onSubmit={this.passwordReset}>
+                                <div className="form-group">
+                                    <label className="col-sm-3 control-label">Name</label>
+                                    <label className="col-sm-8">{profile.name}</label>
+                                </div>
+                                <div className="form-group">
+                                    <label className="col-sm-3 control-label">Email</label>
+                                    <label className="col-sm-8">{profile.email}</label>
+                                    {/*<label className="col-sm-8">{profile.email}</label>*/}
+                                </div>
+                            </div>
                             </div>
                         </div>
                     </div>

@@ -18,7 +18,7 @@ const Header = () => (
                 </div>
                 <div id="navbar" className="navbar-collapse collapse">
                     <ul className="nav navbar-nav">
-                        <li ><Link to='/profile'>Profile</Link></li>
+                        <li ><Link to='/account'>Profile</Link></li>
                         <li ><Link to='/location'>Location</Link></li>
                         <li ><a href="#" onClick={() => {sessionStorage.removeItem('token'); window.location = '/login'}}>Logout</a></li>
                     </ul>
