@@ -163,29 +163,40 @@ def update_password():
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if session['loggedin'] and \
        request.method == 'POST' and \
-       'password' in request.form and \
-       'email' in request.form:
+       'current_password' in request.form and \
+       'new_password' in request.form and \
+       'retype_password' in request.form:
         
         # Create variables for easy access
         hash_username = Utils.hashing(session['username'])
+        cur_password = request.form['cur_password']
         new_password = request.form['new_password']
-        hash_password = Utils.hashing(new_password)
+        retype_password = request.form['retype_password']
+        hash_cur_password = Utils.hashing(cur_password)
+        hash_new_password = Utils.hashing(new_password)
+        hash_retype_password = Utils.hashing(retype_password)
         email = request.form['email']
 
-        if Utils.isvalid_password(password):
-            # Check if account exists using MySQL
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        
-            # If account exists show error and validation checks
-            account = Database.user_exists_in_db(cursor, mysql, hash_username)
-            if account:
-                cursor, mysql, msg = Database.update_password_record(cursor, mysql, [hash_username, hash_password, email])
-            else:
-                msg = 'Account is not registered'
-            # end if
-            cursor.close()
+        if hash_new_password!=hash_retype_password:
+            msg = "New password is not same as retype password"
+        elif hash_cur_password == hash_new_password:
+            msg = "New password is same as current password"
         else:
-            msg = 'Invalid password format!'
+            if Utils.isvalid_password(password):
+                # Check if account exists using MySQL
+                cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                
+                # If account exists show error and validation checks
+                account = Database.user_exists_in_db(cursor, mysql, hash_username)
+                if account:
+                    cursor, mysql, msg = Database.update_password_record(cursor, mysql, [hash_username, hash_password, email])
+                else:
+                    msg = 'New password is set'
+                # end if
+                cursor.close()
+            else:
+                msg = 'Invalid password format!'
+            # end if
         # end if
     # end if
     print(msg)
