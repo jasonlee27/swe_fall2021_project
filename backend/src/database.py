@@ -57,6 +57,15 @@ class Database:
         return cursor, mysql, msg
 
     @classmethod
+    def get_all_stores_in_db(cls, cursor, mysql):
+        cursor.execute('SELECT * FROM Stores')
+        stores = cursor.fetchall()
+        if stores:
+            return stores
+        # end if
+        return
+    
+    @classmethod
     def get_stores_exist_in_db(cls, cursor, mysql, location):
         city, state = location[0], location[1]
         cursor.execute('SELECT * FROM Stores WHERE city = %s AND state = %s', (city, state))

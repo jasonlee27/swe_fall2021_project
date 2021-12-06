@@ -168,8 +168,8 @@ def update_password():
         
         # Create variables for easy access
         hash_username = Utils.hashing(session['username'])
-        password = request.form['password']
-        hash_password = Utils.hashing(password)
+        new_password = request.form['new_password']
+        hash_password = Utils.hashing(new_password)
         email = request.form['email']
 
         if Utils.isvalid_password(password):
@@ -193,8 +193,8 @@ def update_password():
         msg=msg
     )
 
-@app.route('/api/profile/store', methods=['GET', 'POST'])
-def store():
+@app.route('/api/profile/stores', methods=['GET', 'POST'])
+def stores():
     msg = ''
     stores = None
     # check if the requested location exists
@@ -205,15 +205,9 @@ def store():
         city = request.form['city']
         state = request.form['state']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        
-        stores = Database.get_stores_exist_in_db(cursor, mysql, [city, state])
+        stores = Database.get_all_stores_in_db(cursor, mysql)
         if stores:
-            # get store addresses
-            # stores = [s[1] for s in stors]
-            session['store_address'] = stores[1]
-            session['store_city'] = city
-            session['store_state'] = state
-            msg = 'Successfully store set'
+            msg = 'Successfully stores scanned'
         else:
             msg = 'store not exists'
         # end if
@@ -242,7 +236,7 @@ def store_change():
         if stores:
             # get store addresses
             # stores = [s[1] for s in stors]
-            session['store_address'] = stores[1]
+            session['store_address'] = stores["address"]
             session['store_city'] = city
             session['store_state'] = state
             msg = 'Successfully store set'
