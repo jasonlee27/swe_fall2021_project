@@ -39,10 +39,10 @@ class Location extends Component {
                                     <label className="col-sm-3 control-label">
                                         New Location
                                         <select value={this.state.value} onChange={this.handleChange}>
-                                          <option value="location 1">Location 1</option>
-                                          <option value="location 2">Location 2</option>
-                                          <option value="location 3">Location 3</option>
-                                          <option value="location 4">Location 4</option>
+                                          <option value="location 1">2112 preston road, dallas</option>
+                                          <option value="location 2">233 frankford road, Richardson</option>
+                                          <option value="location 3">1817 london bridge, London</option>
+                                          <option value="location 4">1221 walnut road, seattle</option>
                                         </select>
                                     </label>
                                     </div>

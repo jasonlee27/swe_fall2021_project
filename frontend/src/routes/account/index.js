@@ -129,11 +129,21 @@ class Account extends Component {
                             <div className="form-horizontal" onSubmit={this.passwordReset}>
                                 <div className="form-group">
                                     <label className="col-sm-3 control-label">Name</label>
-                                    <label className="col-sm-8">{profile.name}</label>
+                                    <label className="col-sm-8">naruto</label>
                                 </div>
                                 <div className="form-group">
                                     <label className="col-sm-3 control-label">Email</label>
-                                    <label className="col-sm-8">{profile.email}</label>
+                                    <label className="col-sm-8">naruto@gmail.com</label>
+                                    {/*<label className="col-sm-8">{profile.email}</label>*/}
+                                </div>
+                                <div className="form-group">
+                                    <label className="col-sm-3 control-label">Address</label>
+                                    <label className="col-sm-8">1232, ABC road, Dallas</label>
+                                    {/*<label className="col-sm-8">{profile.email}</label>*/}
+                                </div>
+                                <div className="form-group">
+                                    <label className="col-sm-3 control-label">Payment</label>
+                                    <label className="col-sm-8">**** **** **09 9273</label>
                                     {/*<label className="col-sm-8">{profile.email}</label>*/}
                                 </div>
                             </div>
