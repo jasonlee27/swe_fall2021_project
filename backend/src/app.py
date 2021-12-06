@@ -134,6 +134,25 @@ def register():
         msg=msg
     )
 
+@app.route('/api/profile', methods=['GET', 'POST'])
+def profile():
+    msg = 'No input parameters'
+    if session['loggedin'] and request.method == 'POST':
+        userid = session['id']
+        username = session['username']
+        hash_username = Utils.hashing(username)
+        account = Database.user_exists_in_db(cursor, mysql, hash_username)
+        if account:
+            return jsonify(
+                msg=msg,
+                account=account
+            )
+        # end if
+    # end if
+    return jsonify(
+        msg=msg
+    )
+
 # http://localhost:5000/api/register
 # this will be the registration page, we need to use both GET and POST requests
 @app.route('/api/profile/updatepassword', methods=['GET', 'POST'])

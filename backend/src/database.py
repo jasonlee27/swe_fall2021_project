@@ -33,7 +33,18 @@ class Database:
         return cursor, mysql
 
     @classmethod
-    def update_password_record(cls, cursor, mysql, data):
+    def insert_account_record(cls, cursor, mysql, data):
+        # query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
+        # data: [hash_username, hash_password, email]
+        cursor.execute(
+            'INSERT IGNORE INTO Accounts (username, password, email) VALUES (%s, %s, %s)',
+            (data[0], data[1], data[2])
+        )
+        mysql.connection.commit()
+        return cursor, mysql
+
+    @classmethod
+    def get_user_info(cls, cursor, mysql, data):
         # query = "INSERT INTO `accounts` (`username`, `password`, `email`) VALUES ('test_username', 'test_pw', 'test@test.com');"
         # data: [hash_username, new_hash_password]
         hash_username, new_hash_password, email = data[0], data[1], data[2]
