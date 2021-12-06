@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Accounts (
     UNIQUE(username)
 );
 
-INSERT INTO Accounts (username, password, email) VALUES ('test_user', 'test_password', 'test@test.com') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Accounts (username, password, email) VALUES ('test_user', 'test_password', 'test@test.com') ON DUPLICATE KEY UPDATE id=id;
 
 
 -- Store Table
@@ -24,12 +24,12 @@ CREATE TABLE IF NOT EXISTS Stores (
     PRIMARY KEY (id)
 );
 
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('3566 hardman road', 'dallas', 'TX') ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('1234 coit rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('6789 frankford rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('3456 w campbell rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('1339 edgewood avenue', 'addison', 'TX') ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Stores (address, loc_city, loc_state) VALUES ('1629 Orchard Street', 'plano', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('3566 hardman road', 'dallas', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('1234 coit rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('6789 frankford rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('3456 w campbell rd', 'richardson', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('1339 edgewood avenue', 'addison', 'TX') ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Stores (address, loc_city, loc_state) VALUES ('1629 Orchard Street', 'plano', 'TX') ON DUPLICATE KEY UPDATE id=id;
 
 
 -- Item Table
@@ -48,16 +48,16 @@ CREATE TABLE IF NOT EXISTS Items (
     CONSTRAINT item_price_constraint CHECK (price>=0.0)
 );
 
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (1, 3, 'apple', '000000000001', 0.8, '12012021', 300) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (2, 3, 'eggs brown medium grade a', '000000000002', 4.29, '12012021', 200) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (3, 1, 'fat free greek yogurt', '000000000003', 5.49, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (4, 3, 'broccoli florets', '000000000004', 2.59, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (5, 4, 'peanut butter crunchy', '000000000005', 4.1, '11222022', 160) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (6, 4, 'baby spinach salad', '000000000006', 2.29, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (7, 1, 'water spring', '000000000007', 0.89, '11192021', 300) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (8, 2, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (9, 5, 'paper towels 6 pack', '000000000009', 6.49, '10102022', 400) ON DUPLICATE KEY UPDATE id=id;
-INSERT INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (10, 6, 'broccoli florets', '000000000010', 2.59, '11202021', 200) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (1, 3, 'apple', '000000000001', 0.8, '12012021', 300) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (2, 3, 'eggs brown medium grade a', '000000000002', 4.29, '12012021', 200) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (3, 1, 'fat free greek yogurt', '000000000003', 5.49, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (4, 3, 'broccoli florets', '000000000004', 2.59, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (5, 4, 'peanut butter crunchy', '000000000005', 4.1, '11222022', 160) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (6, 4, 'baby spinach salad', '000000000006', 2.29, '11222021', 200) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (7, 1, 'water spring', '000000000007', 0.89, '11192021', 300) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (8, 2, 'paper towels 6 pack', '000000000008', 6.49, '10102022', 400) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (9, 5, 'paper towels 6 pack', '000000000009', 6.49, '10102022', 400) ON DUPLICATE KEY UPDATE id=id;
+INSERT IGNORE INTO Items (id, store_id, itemname, itemcode, price, expirydate, quantity) VALUES (10, 6, 'broccoli florets', '000000000010', 2.59, '11202021', 200) ON DUPLICATE KEY UPDATE id=id;
 
 
 -- Order Table
