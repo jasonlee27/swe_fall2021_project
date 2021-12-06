@@ -194,7 +194,39 @@ def update_password():
     )
 
 @app.route('/api/profile/store', methods=['GET', 'POST'])
-def store(username):
+def store():
+    msg = ''
+    stores = None
+    # check if the requested location exists
+    if session['loggedin'] and \
+       request.method == 'POST' and \
+       'city' in request.form:
+        # Create variables for easy access
+        city = request.form['city']
+        state = request.form['state']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        
+        stores = Database.get_stores_exist_in_db(cursor, mysql, [city, state])
+        if stores:
+            # get store addresses
+            # stores = [s[1] for s in stors]
+            session['store_address'] = stores[1]
+            session['store_city'] = city
+            session['store_state'] = state
+            msg = 'Successfully store set'
+        else:
+            msg = 'store not exists'
+        # end if
+        cursor.close()
+    # end if
+    print(msg)
+    return jsonify(
+        msg = msg,
+        stores = stores
+    )
+
+@app.route('/api/profile/store-change', methods=['GET', 'POST'])
+def store_change():
     msg = ''
     stores = None
     # check if the requested location exists
@@ -306,10 +338,11 @@ def edit_item():
     )
 
 # http://localhost:5000/api/<username>/payment
-@app.route('/api/<username>/payment', methods=['GET', 'POST'])
-def payment(username):
+@app.route('/api/payment', methods=['GET', 'POST'])
+def payment():
     msg = ''
-    if request.method == 'POST' and \
+    if session['loggedin'] and \
+       request.method == 'POST' and \
        'card_number' in request.form and \
        'exp_date' in request.form and \
        'security_code' in request.form:    
@@ -346,10 +379,11 @@ def payment(username):
 
 
 # http://localhost:5000/api/<username>/payment
-@app.route('/api/<username>/orders', methods=['GET', 'POST'])
-def orders(username):
+@app.route('/api/orders', methods=['GET', 'POST'])
+def orders():
     msg = ''
-    if request.method == 'POST' and \
+    if session['loggedin'] and \
+       request.method == 'POST' and \
        'item_list' in request.form and \
        'order_type' in request.form:
 
