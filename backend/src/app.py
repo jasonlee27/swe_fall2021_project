@@ -14,7 +14,7 @@ app.secret_key = Macros.SECRETE_KEY
 # DB connection details
 app.config['MYSQL_HOST'] = Macros.MYSQL_HOST
 app.config['MYSQL_USER'] = Macros.MYSQL_USER
-# app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
+app.config['MYSQL_PASSWORD'] = Macros.MYSQL_PASSWORD
 app.config['MYSQL_DB'] = Macros.MYSQL_DB #str(Macros.DB_FILE)
 
 mysql = MySQL(app)
@@ -368,7 +368,7 @@ def payment():
             invalid_elem.append("Security code")
         # end if
         
-        if len(invalie_elem)==0:
+        if len(invalid_elem)==0:
             msg = 'Valid payment info entered'
             # pop the store selected when the shopping is done
             session.pop('store_address', None)
