@@ -1,7 +1,5 @@
 import React, {Component} from 'react'
 import Button from '../../components/button'
-import Barcode from '../../components/scan/barcode';
-import Webcam from '../../components/scan/react-webcam';
 
 class Home extends Component {
     constructor(props) {
@@ -38,8 +36,6 @@ class Home extends Component {
                                 <Button onClick={this.goToProductPage}>Start Shopping</Button>
                                 <Button onClick={this.goToPasswordPage}>Update password</Button>
                                 <Button onClick={this.goToLocationPage}>Change Location</Button>
-                                <Barcode/>
-                                <Webcam />
                             </div>
                         </div>
                     </div>

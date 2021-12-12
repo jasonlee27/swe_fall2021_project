@@ -112,9 +112,11 @@ export default class Webcam extends Component {
     super();
     this.state = {
       hasUserMedia: false,
+      showVideo: false,
     };
 
     this.scanBarcode = this.scanBarcode.bind(this);
+    this.openReader = this.openReader.bind(this);
   }
 
   componentDidMount() {
@@ -122,7 +124,7 @@ export default class Webcam extends Component {
 
     Webcam.mountedInstances.push(this);
 
-    if (!this.state.hasUserMedia && !Webcam.userMediaRequested) {
+    if (!this.state.hasUserMedia && !Webcam.userMediaRequested && this.state.showVideo) {
       this.requestUserMedia();
     }
   }
@@ -227,6 +229,15 @@ export default class Webcam extends Component {
     let top = y[0];
   
     context.fillText(text, left, top + 50);
+  }
+
+  openReader() {
+    this.setState({showVideo: !(this.state.showVideo)})
+    if (!this.state.showVideo) {
+        this.requestUserMedia();
+    } else{
+        this.setState({ hasUserMedia: false });
+    }
   }
 
   scanBarcode() {
@@ -383,7 +394,10 @@ export default class Webcam extends Component {
 
   render() {
     return (
-      <div id='videoview' width={this.props.width} height={this.props.height}>
+        <div>
+        <button onClick={this.openReader}>Reader</button>
+        {/*<div id='videoview' width={this.props.width} height={this.props.height}>*/}
+        {this.state.showVideo && <div id='videoview' width={this.props.width} height={this.props.height}>
         <button onClick={this.scanBarcode}>Scan Barcodes</button>
         <video
           autoPlay
@@ -399,6 +413,7 @@ export default class Webcam extends Component {
           }}
         />
         <canvas id="overlay" width={this.props.width} height={this.props.height}></canvas>
+      </div>}
       </div>
     );
   }

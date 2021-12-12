@@ -4,7 +4,9 @@ import {errorMsg, successMsg} from '../../components/notification/ToastNotificat
 import Products from '../../components/products/Products';
 import Pagination from 'react-bootstrap/lib/Pagination';
 import api from '../../api';
-
+import Barcode from '../../components/scan/barcode';
+import Webcam from '../../components/scan/react-webcam';
+import Cart from '../../components/cart';
 
 class ProductPage extends Component {
     constructor(props) {
@@ -13,10 +15,24 @@ class ProductPage extends Component {
             product: {
                 id: 0,
                 name:'',
+                image: '',
                 code:'',
                 price:''
             },
-            products: [],
+            cart: [],
+            products: [{
+                id: 0,
+                name:'Apples',
+                image: '../../assets/images/apples.webp',
+                code:'0000',
+                price:'$210'
+            },{
+                id: 1,
+                name:'Oranges',
+                image: '../../assets/images/oranges.webp',
+                code:'0001',
+                price:'$100'
+            }],
             updateDlgFlg: false,
             deleteDlgFlg: false,
             current: 0,
@@ -51,54 +67,37 @@ class ProductPage extends Component {
 
         self.setState({ products: [{
             id: 0,
-            name:'gg',
-            code:'gg',
-            price:'10'
+            name:'Apples',
+            code:'0000',
+            price:'$210'
         },{
             id: 1,
-            name:'gg',
-            code:'gg',
-            price:'10'
+            name:'Oranges',
+            code:'0001',
+            price:'$100'
         }]});
         self.setState({current: 2});
         self.setState({totalPages: 1});
         self.setState({totalElements: 2});
     };
 
-    addProduct = (e) => {
-        e.preventDefault();
-        const {product} = this.state;
-        let self = this;
-        api.put('/api/products/'+product.id, product)
-            .then(function (response) {
-                console.log('product update success response :: ',response);
-                successMsg('Successfully product updated.');
-                self.handleUpdateDlgClose();
-                self.loadProducts();
-            })
-            .catch(function (error) {
-                console.log("product update error response :: ",error);
-                errorMsg('Failed to Update product.');
-            });
-
+    addProduct = (product) => {
+        this.setState({cart: [...this.state.cart, product]})
     };
+    
+    getToCheckout = () => {};
 
-    deleteProduct = (e) => {
-        e.preventDefault();
-        const {product} = this.state;
-        let self = this;
-        api.delete('/api/product/'+product.id)
-            .then(function (response) {
-                console.log('product delete success response :: ',response);
-                successMsg('Successfully Product Deleted.');
-                self.handleDeleteDlgClose();
-                self.loadProducts();
-            })
-            .catch(function (error) {
-                console.log("product delete error response :: ",error);
-                errorMsg('Failed to Delete Product.');
-            });
-
+    deleteProduct = (product) => {
+        var array = [...this.state.cart]; // make a separate copy of the array
+        console.log("array: ", array)
+        console.log("product: ", product)
+        var index = array.indexOf(product)
+        console.log("index:",index)
+        if (index !== -1) {
+          array.splice(index, 1);
+          this.setState({cart: array});
+        }
+        this.setState({deleteDlgFlg:false})
     };
 
     // ---------Update Dialog open/close--------
@@ -157,26 +156,33 @@ class ProductPage extends Component {
     }
 
     render() {
-        const {products, product, updateDlgFlg, deleteDlgFlg, current, totalPages, totalElements} = this.state;
+        const {products, product, updateDlgFlg, deleteDlgFlg, current, totalPages, cart} = this.state;
         let productItem = [];
+        let cartTotal = Object.keys(cart).length
+        let totalElements = Object.keys(products).length
         for (let number = 0; number <= totalPages; number++) {
             productItem.push(
                 <Pagination.Item active={number === current} onClick={() => this.onPaginationChange(number)}>{number+1}</Pagination.Item>
             );
         }
+        
+        let cartComponent =  <div className="product">
+                <button className='btn btn-primary' onClick={this.getToCheckout}> Cart ({cartTotal})</button>
+            </div>
 
-        //let productsComponent = products.map((product) =>
-        //    <div className="product">
-        //        <h4><strong>{product.id}</strong></h4>
-        //        <p>{product.body}</p>
-        //        By <strong>{product.name}</strong>
-        //        <br/> <br/>
-        //        <button className='btn btn-primary' onClick={() => this.handleUpdateDlgShow(product)}> Update</button>
-        //        &nbsp; &nbsp; &nbsp;
-        //        <button className='btn btn-primary' onClick={() => this.handleDeleteDlgShow(product)}> Delete</button>
-        //        <hr/>
-        //    </div>
-        //);
+        let productsComponent = products.map((product) =>
+            <div className="product">
+                <h4><strong>{product.id}</strong></h4>
+                <img src={product.image} alt={product.image}></img>
+                <p>{product.body}</p>
+                <strong>{product.name}</strong>
+                <br/> <br/>
+                <button className='btn btn-primary' onClick={() => this.addProduct(product)}> Add</button>
+                &nbsp; &nbsp; &nbsp;
+                <button className='btn btn-primary' onClick={() => this.deleteProduct(product)}> Delete</button>
+                <hr/>
+            </div>
+        );
 
         return (
             <div>
@@ -185,8 +191,23 @@ class ProductPage extends Component {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="product-header">
+                                    <h2><strong>Reader</strong></h2>
+                                    <Barcode/>
+                                    <Webcam />
+                                </div>
+                            </div>
+                            <div className="col-md-12">
+                                <div className="product-header">
+                                    <h2><strong>Cart</strong></h2>
+                                    {cartComponent}
+                                </div>
+                            </div>
+                            <div className="col-md-12">
+                                <div className="product-header">
                                     <h2><strong>Products</strong></h2>
-                                    <Products productsData={this.state.products}/>
+                                    {console.log("products: ",this.state.products)}
+                                    {productsComponent}
+                                    {/*<Products productsData={this.state.products}/>*/}
                                 </div>
                             </div>
                             <div className="col-md-12">

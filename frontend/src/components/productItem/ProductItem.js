@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import './ProductItem.css';
+import { Card } from 'semantic-ui-react';
 
 class ProductItem extends Component {
     constructor(props) {
@@ -35,20 +36,21 @@ class ProductItem extends Component {
 
     render() {
         return (
-            <li className="product">
-                <button className={this.productHeaderClasses()}
-                        onClick={this.handleClick}>
-                    {this.props.title}
-                </button>
-
-                {this.productDescription()}
-            </li>
+            <Card 
+                //image={this.props.image}
+                header={this.props.name}
+                meta={this.props.price}
+                description={this.props.description}
+            />
         );
     }
 }
 
 ProductItem.propTypes = {
-    title: PropTypes.string.isRequired,
+    //image: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    code: PropTypes.number,
+    price: PropTypes.number,
     description: PropTypes.string
 };
 

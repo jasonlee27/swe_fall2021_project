@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Button from '../../components/button'
+import {errorMsg, successMsg, warnMsg} from '../../components/notification/ToastNotification';
 
 class Location extends Component {
     constructor(props) {
@@ -16,7 +17,7 @@ class Location extends Component {
     }
 
     reset() {
-        alert(this.state.location)
+        successMsg(this.state.location)
     }
 
     render() {

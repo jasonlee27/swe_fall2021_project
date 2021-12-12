@@ -8,10 +8,12 @@
         "react-barcode-reader": "0.0.2",
         "react-bootstrap": "0.32.1",
         "react-dom": "latest",
+        "react-redux": "^7.2.6",
         "react-router-dom": "4.1.1",
         "react-scripts": "1.1.4",
         "react-toastify": "4.2.0",
         "reactstrap": "6.3.1",
+        "semantic-ui-react": "^2.0.4",
         "styled-components": "^5.3.3"
     },
     "scripts": {

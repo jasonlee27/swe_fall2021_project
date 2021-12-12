@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Button from '../../components/button'
+import {errorMsg, successMsg, warnMsg} from '../../components/notification/ToastNotification';
 
 class Password extends Component {
     constructor(props) {
@@ -15,7 +16,7 @@ class Password extends Component {
     }
 
     reset() {
-        alert('reset')
+        successMsg('reset');
     }
 
     render() {
